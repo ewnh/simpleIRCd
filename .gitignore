@@ -1,0 +1,11 @@
+#Visual studio project files
+*.sln
+*.db
+*.vcxproj
+*.filters
+*.opendb
+/.vs/*
+
+#Development
+*.o
+*.exe

@@ -5,6 +5,8 @@
 *.filters
 *.opendb
 /.vs/*
+/ipch/*
+/Debug/*
 
 #Development
 *.o

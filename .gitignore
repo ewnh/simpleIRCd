@@ -4,6 +4,7 @@
 *.vcxproj
 *.filters
 *.opendb
+*.user
 /.vs/*
 /ipch/*
 /Debug/*

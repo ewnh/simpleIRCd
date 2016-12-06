@@ -38,20 +38,24 @@ int main()
 	}
 	printf("Connection accepted\n");
 
-	char* message = "Test";
+	char* message = "Test\n";
 	if (send(new_sock, message, strlen(message), 0) == SOCKET_ERROR) {
 		printf("Send failed: %d\n", WSAGetLastError());
 	}
 
 	char recvbuf[10];
-	int recvbuflen = 512;
+	int recvbuflen = 11;
 	int recvbytes = 1;
 	do {
 		recvbytes = recv(new_sock, recvbuf, recvbuflen, 0);
 		if (recvbytes == 0) { printf("Connection closed"); }
-		printf("Received %i bytes:\n", recvbytes);
+		if (recvbytes == 2) { ; }
+		printf("Received %i bytes: ", recvbytes);
 		recvbuf[9] = 0;
-		printf("%s", recvbuf);
+		printf("%s\n", recvbuf);
+		for (int i = 0; i < 10; i++) {
+			recvbuf[i] = ' ';
+		}
 	} while (recvbytes > 0);
 
 	getchar();

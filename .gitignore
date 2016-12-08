@@ -1,4 +1,4 @@
-#Visual studio project files
+#Project files
 *.sln
 *.db
 *.vcxproj
@@ -8,6 +8,8 @@
 /.vs/*
 /ipch/*
 /Debug/*
+
+*.cbp
 
 #Development
 *.o

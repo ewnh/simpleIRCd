@@ -24,6 +24,7 @@ int main()
 	server.sin_port = htons(10000);
 
 	if (bind(sock, (struct sockaddr *)&server, sizeof(server)) == SOCKET_ERROR) {
+
 		printf("Bind failed: %d\n", WSAGetLastError());
 	}
 
@@ -43,22 +44,25 @@ int main()
 		printf("Send failed: %d\n", WSAGetLastError());
 	}
 
-	char recvbuf[10];
-	int recvbuflen = 11;
-	int recvbytes = 1;
+	char messagebuf[513];
+	int recvbytes = 0;
 	do {
-		recvbytes = recv(new_sock, recvbuf, recvbuflen, 0);
-		if (recvbytes == 0) { printf("Connection closed"); }
-		if (recvbytes == 2) { ; }
+		recvbytes = recv(new_sock, messagebuf, 512, 0);
 		printf("Received %i bytes: ", recvbytes);
-		recvbuf[9] = 0;
-		printf("%s\n", recvbuf);
-		for (int i = 0; i < 10; i++) {
-			recvbuf[i] = ' ';
+		for(int i = 0; i < 513; i++) {
+            if(messagebuf[i] == '\r' && messagebuf[i+1] == '\n') {
+                printf("CRLF\n");
+                messagebuf[i+2] = '\0';
+                break;
+            }
 		}
+        for(int i = 0; i < recvbytes; i++) {
+            printf("%c", messagebuf[i]);
+        }
+        printf("\n");
 	} while (recvbytes > 0);
 
-	getchar();
+	printf("Connection closed\n");
 
 	closesocket(sock);
 	WSACleanup();

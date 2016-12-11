@@ -10,8 +10,12 @@ int main()
 
         SOCKET c_sock = s_accept(sock);
         s_send(c_sock);
-        s_recv(c_sock, message);
-        printf("%s", message);
+
+        while(1) {
+            s_recv(c_sock, message);
+            printf("%s", message);
+            memset(message, 0, sizeof(message));
+        }
         printf("Connection closed\n");
 
         closesocket(c_sock);

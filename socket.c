@@ -31,8 +31,10 @@ SOCKET server_setup() {
 	printf("Bind complete\n");
 	return sock;
 }
+
 SOCKET s_accept(SOCKET sock) {
     struct sockaddr_in client;
+
 
 	listen(sock, 1);
 	printf("Waiting\n");
@@ -46,28 +48,25 @@ SOCKET s_accept(SOCKET sock) {
 
 	return c_sock;
 }
+
 void s_send(SOCKET c_sock) {
     char* message = "Test\n";
 	if (send(c_sock, message, strlen(message), 0) == SOCKET_ERROR) {
 		printf("Send failed: %d\n", WSAGetLastError());
 	}
 }
-void s_recv(SOCKET c_sock) {
-    char messagebuf[513];
-    int recvbytes = 0;
-	do {
-		recvbytes = recv(c_sock, messagebuf, 512, 0);
-		printf("Received %i bytes: ", recvbytes);
-		for(int i = 0; i < 513; i++) {
-            if(messagebuf[i] == '\r' && messagebuf[i+1] == '\n') {
-                printf("CRLF\n");
-                messagebuf[i+2] = '\0';
-                break;
+
+void s_recv(SOCKET c_sock, char* message) {
+    int recvbytes;
+    int totalrecv = 0;
+    do {
+        recvbytes = recv(c_sock, &message[totalrecv], 512, 0);
+        totalrecv += recvbytes;
+
+        for(int i = 0; i < 513; i++) {
+            if(message[i] == '\r' && message[i+1] == '\n') {
+                return;
             }
-		}
-        for(int i = 0; i < recvbytes; i++) {
-            printf("%c", messagebuf[i]);
         }
-        printf("\n");
-	} while (recvbytes > 0);
+    } while (recvbytes > 0);
 }

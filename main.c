@@ -4,12 +4,18 @@
 int main()
 {
     SOCKET sock = server_setup();
-    SOCKET c_sock = s_accept(sock);
-    s_send(c_sock);
-	s_recv(c_sock);
-	printf("Connection closed\n");
+    char message[513] = {0};
 
-	closesocket(sock);
+    while(1) {
+
+        SOCKET c_sock = s_accept(sock);
+        s_send(c_sock);
+        s_recv(c_sock, message);
+        printf("%s", message);
+        printf("Connection closed\n");
+
+        closesocket(c_sock);
+    }
 	WSACleanup();
 	return 0;
 }

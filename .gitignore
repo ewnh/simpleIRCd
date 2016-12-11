@@ -9,7 +9,6 @@
 /ipch/*
 /Debug/*
 
-*.cbp
 *.layout
 *.cscope_file_list
 

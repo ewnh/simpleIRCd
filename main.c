@@ -2,12 +2,12 @@
 #include <process.h>
 #include "socket.h"
 
-struct h_cThread {
+struct user {
     SOCKET c_sock;
     char* message;
 };
 
-void* handle_connection(struct h_cThread* hc) { //(__cdecl)
+void* handle_connection(struct user* hc) { //(__cdecl)
     printf("In thread");
     while(1) {
         s_recv(hc->c_sock, hc->message);
@@ -20,18 +20,17 @@ void* handle_connection(struct h_cThread* hc) { //(__cdecl)
 int main()
 {
     SOCKET sock = server_setup();
-    SOCKET socklist[2] = {};
     char message[513] = {0};
-    struct h_cThread hcstruct;
+    struct user[4] users;
 
     for(int i = 0; i < 10; i++) {
 
-        socklist[i] = s_accept(sock);
+        struct user usr;
+        usr.c_sock = s_accept(sock);
+        usr.message = &message;
 
         s_send(socklist[i]);
-        hcstruct.c_sock = socklist[i];
-        hcstruct.message = &message;
-        _beginthread(handle_connection, 0, &hcstruct);
+        _beginthread(handle_connection, 0, &usr);
 
         //printf("Connection closed\n");
 

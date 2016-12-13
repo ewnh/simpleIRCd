@@ -1,9 +1,13 @@
 #include <stdio.h>
-#include <process.h>
+
+#ifdef _WIN32
+	#include <process.h>
+#endif
+
 #include "socket.h"
 
 struct user {
-    SOCKET c_sock;
+    SOCK c_sock;
     char* message;
 };
 
@@ -36,6 +40,10 @@ int main()
 
         //closesocket(socklist[i]);
     }
-	WSACleanup();
+
+    #ifdef _WIN32
+		WSACleanup();
+	#endif
+		
 	return 0;
 }

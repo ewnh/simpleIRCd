@@ -7,12 +7,12 @@ struct user {
     char* message;
 };
 
-void* handle_connection(struct user* hc) { //(__cdecl)
+void handle_connection(struct user* hc) { //(__cdecl)
     printf("In thread");
     while(1) {
         s_recv(hc->c_sock, hc->message);
         printf("%s", hc->message);
-        memset(hc->message, 0, sizeof(hc->message));
+        memset(hc->message, 0, 513);
     }
     return;
 }
@@ -21,15 +21,15 @@ int main()
 {
     SOCKET sock = server_setup();
     char message[513] = {0};
-    struct user[4] users;
+    //struct user[4] users;
 
-    for(int i = 0; i < 10; i++) {
+    while(1) {
 
         struct user usr;
         usr.c_sock = s_accept(sock);
         usr.message = &message;
 
-        s_send(socklist[i]);
+        s_send(usr.c_sock);
         _beginthread(handle_connection, 0, &usr);
 
         //printf("Connection closed\n");

@@ -60,7 +60,7 @@ void s_recv(SOCKET c_sock, char* message) {
     int recvbytes;
     int totalrecv = 0;
     do {
-        recvbytes = recv(c_sock, &message[totalrecv], 512, 0);
+        recvbytes = recv(c_sock, &message[totalrecv], 512-totalrecv, 0);
         totalrecv += recvbytes;
 
         for(int i = 0; i < 513; i++) {

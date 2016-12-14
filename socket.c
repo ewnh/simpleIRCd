@@ -6,8 +6,9 @@
 	#define ERROR WSAGetLastError()
 #else
 	#include <sys/socket.h>
+	#include <netinet/in.h>
 	#define SOCK int
-	#define ERROR null
+	#define ERROR 
 #endif
 
 #pragma comment(lib, "ws2_32.lib")
@@ -27,19 +28,33 @@ SOCK server_setup() {
     struct sockaddr_in server;
 
     sock = socket(AF_INET, SOCK_STREAM, 0);
-	if (sock == INVALID_SOCK || sock < 0) {
-		printf("Cannot create socket: %d\n", ERROR);
-	}
+
+    #ifdef _WIN32
+		if (sock == INVALID_SOCK) {
+			printf("Cannot create socket: %d\n", WSAGetLastError());
+		}
+	#else
+		if(sock < 0) {
+			printf("Cannot create socket");
+		}
+	#endif
+
 	printf("Socket Created\n");
 
 	server.sin_family = AF_INET;
 	server.sin_addr.s_addr = INADDR_ANY;
 	server.sin_port = htons(10000);
 
-	if (bind(sock, (struct sockaddr *)&server, sizeof(server)) == SOCK_ERROR) {
-
-		printf("Bind failed: %d\n", ERROR;
-	}
+	int err = bind(sock, (struct sockaddr *)&server, sizeof(server));
+	#ifdef _WIN32
+		if (err == SOCK_ERROR) {
+			printf("Bind failed: %d\n", WSAGetLastError());
+		}
+	#else
+		if(err < 0) {
+			printf("Bind failed");
+		}
+	#endif
 
 	printf("Bind complete\n");
 	return sock;
@@ -54,9 +69,16 @@ SOCK s_accept(SOCK sock) {
 
 	int c = sizeof(struct sockaddr_in);
     SOCK c_sock = accept(sock, (struct sockaddr *)&client, &c);
-	if (c_sock == INVALID_SOCK || c_sock < 0) {
-		printf("Accept failed: %d\n", ERROR;
-	}
+
+    #ifdef _WIN32
+		if (c_sock == INVALID_SOCK) {
+			printf("Accept failed: %d\n", ERROR;
+		}
+	#else
+		if(c_sock < 0) {
+			printf("Accept failed");
+		}
+	#endif
 	printf("Connection accepted\n");
 
 	return c_sock;
@@ -67,12 +89,13 @@ void s_send(SOCK c_sock) {
 
     #ifdef _WIN32
 		if (send(c_sock, message, strlen(message), 0) == SOCK_ERROR) {
-			printf("Send failed: %d\n", ERROR;
+			printf("Send failed: %d\n", WSAGetLastError();
 		}
 	#else
-		if(send(c_sock, message, strlen(message)) < 0) {
-			printf("Send failed: %d\n", ERROR);
+		if(write(c_sock, message, strlen(message)) < 0) {
+			printf("Send failed\n");
 		}
+	#endif
 }
 
 void s_recv(SOCK c_sock, char* message) {

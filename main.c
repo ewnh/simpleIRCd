@@ -23,7 +23,7 @@ void handle_connection(struct user* hc) { //(__cdecl)
 
 int main()
 {
-    SOCKET sock = server_setup();
+    SOCK sock = server_setup();
     char message[513] = {0};
     struct user users[4];
 

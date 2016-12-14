@@ -2,6 +2,8 @@
 
 #ifdef _WIN32
 #include <process.h>
+#else
+#include <pthread.h>
 #endif
 
 #include "socket.h"
@@ -34,8 +36,13 @@ int main()
         users[i].message = &message;
 
         s_send(users[i].c_sock);
+        #ifdef _WIN32
         _beginthread(handle_connection, 0, &users[i]);
 
+        #else
+        pthread_t conthread;
+        pthread_create(&conthread, NULL, handle_connection, &users[i]);
+        #endif
         //printf("Connection closed\n");
 
         //closesocket(socklist[i]);

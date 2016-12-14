@@ -1,9 +1,16 @@
 #include <stdio.h>
+
+#ifdef _WIN32
 #include <process.h>
+#else
+#include <string.h>
+#include <pthread.h>
+#endif
+
 #include "socket.h"
 
 struct user {
-    SOCKET c_sock;
+    SOCK c_sock;
     char* message;
 };
 
@@ -19,7 +26,7 @@ void handle_connection(struct user* hc) { //(__cdecl)
 
 int main()
 {
-    SOCKET sock = server_setup();
+    SOCK sock = server_setup();
     char message[513] = {0};
     struct user users[4];
 
@@ -30,12 +37,21 @@ int main()
         users[i].message = message;
 
         s_send(users[i].c_sock);
-        _beginthread((void *)handle_connection, 0, &users[i]);
 
+        #ifdef _WIN32
+        _beginthread((void *)handle_connection, 0, &users[i]);
+        #else
+        pthread_t conthread;
+        pthread_create(&conthread, NULL, (void *)handle_connection, &users[i]);
+        #endif
         //printf("Connection closed\n");
 
         //closesocket(socklist[i]);
     }
-	WSACleanup();
+
+    #ifdef _WIN32
+    WSACleanup();
+	#endif
+
 	return 0;
 }

@@ -3,6 +3,7 @@
 #ifdef _WIN32
 #include <process.h>
 #else
+#include <string.h>
 #include <pthread.h>
 #endif
 
@@ -41,7 +42,7 @@ int main()
 
         #else
         pthread_t conthread;
-        pthread_create(&conthread, NULL, handle_connection, &users[i]);
+        pthread_create(&conthread, NULL, (void *)handle_connection, &users[i]);
         #endif
         //printf("Connection closed\n");
 

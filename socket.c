@@ -1,14 +1,14 @@
 #include <stdio.h>
 
 #ifdef _WIN32
-	#include <winsock2.h>
-	#define SOCK SOCKET //socket type
-	#define ERROR WSAGetLastError()
+#include <winsock2.h>
+#define SOCK SOCKET //socket type
+
 #else
-	#include <sys/socket.h>
-	#include <netinet/in.h>
-	#define SOCK int
-	#define ERROR 
+#include <sys/socket.h>
+#include <netinet/in.h>
+#define SOCK int
+
 #endif
 
 #pragma comment(lib, "ws2_32.lib")
@@ -16,12 +16,12 @@
 SOCK server_setup() {
 
 	#ifdef _WIN32
-	    WSADATA wsa;
+    WSADATA wsa;
 
-		if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0) {
-			printf("Failed to initialise WinSock: %d\n", WSAGetLastError());
-		}
-		printf("Initialised Winsock\n");
+    if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0) {
+        printf("Failed to initialise WinSock: %d\n", WSAGetLastError());
+    }
+    printf("Initialised Winsock\n");
 	#endif
 
     SOCK sock;
@@ -30,13 +30,13 @@ SOCK server_setup() {
     sock = socket(AF_INET, SOCK_STREAM, 0);
 
     #ifdef _WIN32
-		if (sock == INVALID_SOCK) {
-			printf("Cannot create socket: %d\n", WSAGetLastError());
-		}
+    if (sock == INVALID_SOCKET) {
+        printf("Cannot create socket: %d\n", WSAGetLastError());
+    }
 	#else
-		if(sock < 0) {
-			printf("Cannot create socket");
-		}
+    if(sock < 0) {
+        printf("Cannot create socket");
+    }
 	#endif
 
 	printf("Socket Created\n");
@@ -47,13 +47,13 @@ SOCK server_setup() {
 
 	int err = bind(sock, (struct sockaddr *)&server, sizeof(server));
 	#ifdef _WIN32
-		if (err == SOCK_ERROR) {
-			printf("Bind failed: %d\n", WSAGetLastError());
-		}
+    if (err == SOCKET_ERROR) {
+        printf("Bind failed: %d\n", WSAGetLastError());
+    }
 	#else
-		if(err < 0) {
-			printf("Bind failed");
-		}
+    if(err < 0) {
+        printf("Bind failed");
+    }
 	#endif
 
 	printf("Bind complete\n");
@@ -71,13 +71,13 @@ SOCK s_accept(SOCK sock) {
     SOCK c_sock = accept(sock, (struct sockaddr *)&client, &c);
 
     #ifdef _WIN32
-		if (c_sock == INVALID_SOCK) {
-			printf("Accept failed: %d\n", ERROR;
-		}
+    if (c_sock == INVALID_SOCKET) {
+        printf("Accept failed: %d\n", ERROR);
+    }
 	#else
-		if(c_sock < 0) {
-			printf("Accept failed");
-		}
+    if(c_sock < 0) {
+        printf("Accept failed");
+    }
 	#endif
 	printf("Connection accepted\n");
 
@@ -88,13 +88,13 @@ void s_send(SOCK c_sock) {
     char* message = "Test\n";
 
     #ifdef _WIN32
-		if (send(c_sock, message, strlen(message), 0) == SOCK_ERROR) {
-			printf("Send failed: %d\n", WSAGetLastError();
-		}
+    if (send(c_sock, message, strlen(message), 0) == SOCKET_ERROR) {
+        printf("Send failed: %d\n", WSAGetLastError());
+    }
 	#else
-		if(write(c_sock, message, strlen(message)) < 0) {
-			printf("Send failed\n");
-		}
+    if(write(c_sock, message, strlen(message)) < 0) {
+        printf("Send failed\n");
+    }
 	#endif
 }
 
@@ -103,9 +103,9 @@ void s_recv(SOCK c_sock, char* message) {
     int totalrecv = 0;
     do {
     	#ifdef _WIN32
-        	recvbytes = recv(c_sock, &message[totalrecv], 512, 0);
+        recvbytes = recv(c_sock, &message[totalrecv], 512, 0);
     	#else
-        	recvbytes = read(c_sock, &message[totalrecv], 512);
+        recvbytes = read(c_sock, &message[totalrecv], 512);
        	#endif
 
         totalrecv += recvbytes;

@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 #ifdef _WIN32
-	#include <process.h>
+#include <process.h>
 #endif
 
 #include "socket.h"
@@ -42,8 +42,8 @@ int main()
     }
 
     #ifdef _WIN32
-		WSACleanup();
+    WSACleanup();
 	#endif
-		
+
 	return 0;
 }

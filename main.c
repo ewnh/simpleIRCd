@@ -27,10 +27,10 @@ int main()
 
         //struct user usr;
         users[i].c_sock = s_accept(sock);
-        users[i].message = &message;
+        users[i].message = message;
 
         s_send(users[i].c_sock);
-        _beginthread(handle_connection, 0, &users[i]);
+        _beginthread((void *)handle_connection, 0, &users[i]);
 
         //printf("Connection closed\n");
 

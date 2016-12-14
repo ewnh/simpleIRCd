@@ -100,22 +100,25 @@ void s_send(SOCK c_sock) {
 	#endif
 }
 
-void s_recv(SOCK c_sock, char* message) {
+int s_recv(SOCK c_sock, char* message) {
     int recvbytes;
     int totalrecv = 0;
     do {
-    	
+
     	#ifdef _WIN32
         recvbytes = recv(c_sock, &message[totalrecv], 512-totalrecv, 0);
     	#else
         recvbytes = read(c_sock, &message[totalrecv], 512-totalrecv);
        	#endif
+       	if(recvbytes == 0) {
+            return 1;
+       	}
 
         totalrecv += recvbytes;
 
         for(int i = 0; i < 513; i++) {
             if(message[i] == '\r' && message[i+1] == '\n') {
-                return;
+                return 0;
             }
         }
     } while (recvbytes > 0);

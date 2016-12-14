@@ -12,6 +12,6 @@
 SOCK server_setup();
 SOCK s_accept(SOCK sock);
 void s_send(SOCK c_sock);
-void s_recv(SOCK c_sock, char* mp);
+int s_recv(SOCK c_sock, char* mp);
 
 #endif // SOCKET_H_INCLUDED

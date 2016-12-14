@@ -15,12 +15,16 @@ struct user {
 };
 
 void handle_connection(struct user* hc) { //(__cdecl)
-    printf("In thread");
     while(1) {
-        s_recv(hc->c_sock, hc->message);
+        int recvstat = s_recv(hc->c_sock, hc->message);
+        if(recvstat == 1) {
+            break;
+        }
         printf("%i: %s", hc->c_sock, hc->message);
         memset(hc->message, 0, 513);
     }
+    printf("Connection closed\n");
+    closesocket(hc->c_sock);
     return;
 }
 
@@ -28,11 +32,10 @@ int main()
 {
     SOCK sock = server_setup();
     char message[513] = {0};
-    struct user users[4];
+    struct user users[512];
 
     for(int i = 0; 1; i++) {
 
-        //struct user usr;
         users[i].c_sock = s_accept(sock);
         users[i].message = message;
 
@@ -44,9 +47,6 @@ int main()
         pthread_t conthread;
         pthread_create(&conthread, NULL, (void *)handle_connection, &users[i]);
         #endif
-        //printf("Connection closed\n");
-
-        //closesocket(socklist[i]);
     }
 
     #ifdef _WIN32

@@ -4,6 +4,7 @@
 #include <process.h>
 #else
 #include <string.h>
+#include <unistd.h>
 #include <pthread.h>
 #endif
 
@@ -24,7 +25,11 @@ void handle_connection(struct user* hc) { //(__cdecl)
         memset(hc->message, 0, 513);
     }
     printf("Connection closed\n");
+    #ifdef _WIN32
     closesocket(hc->c_sock);
+	#else
+    close(hc->c_sock);
+    #endif
     return;
 }
 

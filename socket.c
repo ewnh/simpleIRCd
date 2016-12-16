@@ -94,9 +94,7 @@ SOCK s_accept(SOCK sock) {
 	return c_sock;
 }
 
-void s_send(SOCK c_sock) {
-    char* message = "Test\n";
-
+void s_send(SOCK c_sock, char* message) {
     #ifdef _WIN32
     if (send(c_sock, message, strlen(message), 0) == SOCKET_ERROR) {
         printf("Send failed: %d\n", WSAGetLastError());

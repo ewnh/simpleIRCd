@@ -68,9 +68,14 @@ SOCK server_setup() {
 	return sock;
 }
 
+void server_shutdown() {
+    #ifdef _WIN32
+    WSACleanup();
+	#endif
+}
+
 SOCK s_accept(SOCK sock) {
     struct sockaddr_in client;
-
 
 	listen(sock, 1);
 	printf("Waiting\n");
@@ -132,4 +137,12 @@ int s_recv(SOCK c_sock, char* message) {
             }
         }
     } while (recvbytes > 0);
+}
+
+void s_close(SOCK c_sock) {
+    #ifdef _WIN32
+    closesocket(c_sock);
+    #else
+    close(c_sock);
+    #endif
 }

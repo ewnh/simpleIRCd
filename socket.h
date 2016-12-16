@@ -10,8 +10,10 @@
 #endif
 
 SOCK server_setup();
+void server_shutdown();
 SOCK s_accept(SOCK sock);
 void s_send(SOCK c_sock);
 int s_recv(SOCK c_sock, char* mp);
+void s_close(SOCK c_sock);
 
 #endif // SOCKET_H_INCLUDED

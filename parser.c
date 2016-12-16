@@ -9,7 +9,7 @@
 #include "socket.h"
 #include "parser.h"
 
-void handle_connection(struct user* hc) { //(__cdecl)
+void handle_connection(struct user* hc) {
     s_send(hc->c_sock);
     while(1) {
         int recvstat = s_recv(hc->c_sock, hc->message);

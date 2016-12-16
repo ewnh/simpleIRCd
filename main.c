@@ -1,7 +1,6 @@
 #include <stdio.h>
 
-#ifdef _WIN32
-#else
+#ifdef linux
 #include <string.h>
 #include <unistd.h>
 #endif

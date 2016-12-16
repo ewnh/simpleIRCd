@@ -14,8 +14,6 @@
 
 #endif
 
-#pragma comment(lib, "ws2_32.lib")
-
 SOCK server_setup() {
 
 	#ifdef _WIN32

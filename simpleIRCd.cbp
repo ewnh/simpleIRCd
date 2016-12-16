@@ -47,10 +47,15 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="makefile" />
+		<Unit filename="parser.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="parser.h" />
 		<Unit filename="socket.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="socket.h" />
+		<Unit filename="structs.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

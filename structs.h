@@ -5,7 +5,7 @@
 
 struct user {
     SOCK c_sock;
-    char* message;
+    char message[513];
 };
 
 #endif // STRUCTS_H_INCLUDED

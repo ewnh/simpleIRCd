@@ -1,10 +1,5 @@
 #include <stdio.h>
 
-#ifdef linux
-#include <string.h>
-#include <unistd.h>
-#endif
-
 #include "socket.h"
 #include "parser.h"
 

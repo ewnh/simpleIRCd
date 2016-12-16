@@ -4,6 +4,7 @@
 #include <process.h>
 #else
 #include <pthread.h>
+#include <string.h>
 #endif
 
 #include "socket.h"

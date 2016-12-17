@@ -43,19 +43,19 @@
 		</Compiler>
 		<Unit filename=".gitignore" />
 		<Unit filename="README.md" />
-		<Unit filename="main.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="makefile" />
-		<Unit filename="parser.c">
+		<Unit filename="src/main.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="parser.h" />
-		<Unit filename="socket.c">
+		<Unit filename="src/parser.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="socket.h" />
-		<Unit filename="structs.h" />
+		<Unit filename="src/parser.h" />
+		<Unit filename="src/socket.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/socket.h" />
+		<Unit filename="src/structs.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

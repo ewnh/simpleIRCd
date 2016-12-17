@@ -6,14 +6,11 @@
 int main()
 {
     SOCK sock = server_setup();
-    struct user users[512];
 
-    for(int i = 0; 1; i++) {
-
-        users[i].c_sock = s_accept(sock);
-
-        start_handle_thread(&users[i]);
-
+    while(1) {
+        struct user* usr = malloc(sizeof(struct user));
+        usr->c_sock = s_accept(sock);
+        start_handle_thread(usr);
     }
     server_shutdown();
 	return 0;

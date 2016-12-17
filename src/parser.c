@@ -13,15 +13,16 @@
 void handle_connection(struct user* hc) {
     s_send(hc->c_sock, "Test\n");
     while(1) {
+        memset(hc->message, 0, 513);
         int recvstat = s_recv(hc->c_sock, hc->message);
         if(recvstat == 1) {
             break;
         }
         printf("%i: %s", hc->c_sock, hc->message);
-        memset(hc->message, 0, 513);
     }
     printf("Connection closed\n");
     s_close(hc->c_sock);
+    free(hc);
     return;
 }
 

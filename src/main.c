@@ -5,6 +5,7 @@
 
 int main()
 {
+    struct channel* channels = NULL;
     SOCK sock = server_setup();
 
     while(1) {

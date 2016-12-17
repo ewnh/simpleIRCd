@@ -18,7 +18,7 @@ void handle_connection(struct user* hc) {
         if(recvstat == 1) {
             break;
         }
-        printf("%i: %s", hc->c_sock, hc->message);
+        printf("%i: %s\n", hc->c_sock, hc->message);
     }
     printf("Connection closed\n");
     s_close(hc->c_sock);

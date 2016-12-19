@@ -10,7 +10,8 @@ struct user {
 };
 
 struct channel {
-    struct user* users;
+    char name[50];
+    struct user* users[10];
     UT_hash_handle hh;
 };
 

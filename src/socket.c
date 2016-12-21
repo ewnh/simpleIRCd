@@ -126,7 +126,7 @@ int s_recv(SOCK c_sock, char* message) {
 
         totalrecv += recvbytes;
 
-        for(int i = 0; i < 513; i++) {
+        for(int i = 0; i < 512; i++) {
             if(message[i] == '\r' && message[i+1] == '\n') {
                 message[i] = '\0';
                 return 0;

@@ -9,9 +9,15 @@ void join_channel(struct channel** channels, struct user* hc, char* name) {
 
     if(chn == NULL) { //channel doesn't already exist
         chn = malloc(sizeof(struct channel));
+        if(strlen(name) > 50) {
+            printf("Channel name too long\n");
+            return;
+        }
         strcpy(chn->name, name);
+
         memset(chn->users, 0, sizeof(chn->users));
         chn->users[0] = hc;
+
         HASH_ADD_STR(*channels, name, chn);
         }
 

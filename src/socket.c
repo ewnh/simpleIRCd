@@ -102,6 +102,14 @@ SOCK s_accept(SOCK sock) {
 
 void s_send(SOCK c_sock, char* command, char* target, char* message) {
 
+    if((strlen(hostname) + strlen(command) + strlen(target) + strlen(message) + 8) > 512) {
+        printf("Message too long to send\n");
+        printf("Command: %s\n", command);
+        printf("Target: %s\n", target);
+        printf("Message: %s\n", message);
+    }
+
+    //Server messages should be of the form :hostname command target parameters
     char response[512] = {":"};
     strcat(response, hostname);
     strcat(response, " ");

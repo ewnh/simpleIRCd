@@ -44,6 +44,10 @@
 		<Unit filename=".gitignore" />
 		<Unit filename="README.md" />
 		<Unit filename="makefile" />
+		<Unit filename="src/commands.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/commands.h" />
 		<Unit filename="src/main.c">
 			<Option compilerVar="CC" />
 		</Unit>

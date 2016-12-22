@@ -13,6 +13,8 @@
 
 #endif
 
+char hostname[256];
+
 SOCK server_setup() {
 
 	#ifdef _WIN32
@@ -24,6 +26,8 @@ SOCK server_setup() {
     }
     printf("Initialised Winsock\n");
 	#endif
+
+    gethostname(hostname, sizeof(hostname));
 
     SOCK sock;
     struct sockaddr_in server;
@@ -96,14 +100,25 @@ SOCK s_accept(SOCK sock) {
 	return c_sock;
 }
 
-void s_send(SOCK c_sock, char* message) {
+void s_send(SOCK c_sock, char* command, char* target, char* message) {
+
+    char response[512] = {":"};
+    strcat(response, hostname);
+    strcat(response, " ");
+    strcat(response, command);
+    strcat(response, " ");
+    strcat(response, target);
+    strcat(response, " ");
+    strcat(response, message);
+    strcat(response, "\r\n");
+
     #ifdef _WIN32
-    if (send(c_sock, message, strlen(message), 0) == SOCKET_ERROR) {
+    if (send(c_sock, response, strlen(response), 0) == SOCKET_ERROR) {
         printf("Send failed: %d\n", WSAGetLastError());
         exit(EXIT_FAILURE);
     }
 	#else
-    if(write(c_sock, message, strlen(message)) < 0) {
+    if(write(c_sock, response, strlen(response)) < 0) {
         perror("Send failed\n");
         exit(EXIT_FAILURE);
     }

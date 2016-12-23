@@ -22,6 +22,10 @@ void handle_connection(struct user* hc) {
         }
         printf("%i: %s\n", hc->c_sock, hc->message);
 
+        if(strlen(hc->message) == 0) {
+            continue;
+        }
+
         char* strptr = strtok(hc->message, " ");
         if(strcmp(strptr, "JOIN") == 0) {
             join_channel(&channels, hc, strtok(NULL, " "));

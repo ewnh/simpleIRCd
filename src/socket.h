@@ -12,6 +12,7 @@
 SOCK server_setup();
 void server_shutdown();
 SOCK s_accept(SOCK);
+void s_send_host(SOCK, char*, char*, char*, char*);
 void s_send(SOCK, char*, char*, char*);
 int s_recv(SOCK, char*);
 void s_close(SOCK);

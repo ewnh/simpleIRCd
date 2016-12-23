@@ -13,7 +13,7 @@
 
 #endif
 
-char hostname[256];
+char server_name[256];
 
 SOCK server_setup() {
 
@@ -27,7 +27,7 @@ SOCK server_setup() {
     printf("Initialised Winsock\n");
 	#endif
 
-    gethostname(hostname, sizeof(hostname));
+    gethostname(server_name, sizeof(server_name));
 
     SOCK sock;
     struct sockaddr_in server;
@@ -100,7 +100,7 @@ SOCK s_accept(SOCK sock) {
 	return c_sock;
 }
 
-void s_send(SOCK c_sock, char* command, char* target, char* message) {
+void s_send_host(SOCK c_sock, char* hostname, char* command, char* target, char* message) {
 
     if((strlen(hostname) + strlen(command) + strlen(target) + strlen(message) + 8) > 512) {
         printf("Message too long to send\n");
@@ -131,6 +131,12 @@ void s_send(SOCK c_sock, char* command, char* target, char* message) {
         exit(EXIT_FAILURE);
     }
 	#endif
+}
+
+//Wrapper over s_send_host - sends the server hostname instead of a user's hostname
+//For use when sending server messages
+void s_send(SOCK c_sock, char* command, char* target, char* message) {
+    s_send_host(c_sock, server_name, command, target, message);
 }
 
 int s_recv(SOCK c_sock, char* message) {

@@ -14,7 +14,6 @@
 struct channel* channels = NULL;
 
 void handle_connection(struct user* hc) {
-    s_send(hc->c_sock, "TESTCOMMAND", "User", "You have connected");
     while(1) {
         memset(hc->message, 0, 513);
         int recvstat = s_recv(hc->c_sock, hc->message);

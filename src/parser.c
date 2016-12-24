@@ -16,7 +16,7 @@ struct channel* channels = NULL;
 void handle_connection(struct user* hc) {
     while(1) {
         memset(hc->message, 0, 513);
-        int recvstat = s_recv(hc->c_sock, hc->message);
+        int recvstat = sock_recv(hc->c_sock, hc->message);
         if(recvstat == 1) {
             break;
         }
@@ -32,7 +32,7 @@ void handle_connection(struct user* hc) {
         }
     }
     printf("Connection closed\n");
-    s_close(hc->c_sock);
+    sock_close(hc->c_sock);
     free(hc);
     return;
 }

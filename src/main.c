@@ -9,7 +9,7 @@ int main()
 
     while(1) {
         struct user* usr = malloc(sizeof(struct user));
-        usr->c_sock = s_accept(sock);
+        usr->c_sock = sock_accept(sock);
         start_handle_thread(usr);
     }
     server_shutdown();

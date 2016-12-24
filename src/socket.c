@@ -75,7 +75,7 @@ void server_shutdown() {
 	#endif
 }
 
-SOCK s_accept(SOCK sock) {
+SOCK sock_accept(SOCK sock) {
     struct sockaddr_in client;
 
 	listen(sock, 1);
@@ -100,7 +100,7 @@ SOCK s_accept(SOCK sock) {
 	return c_sock;
 }
 
-void s_send_host(SOCK c_sock, char* hostname, char* command, char* target, char* message) {
+void sock_send_host(SOCK c_sock, char* hostname, char* command, char* target, char* message) {
 
     if((strlen(hostname) + strlen(command) + strlen(target) + strlen(message) + 8) > 512) {
         printf("Message too long to send\n");
@@ -135,11 +135,11 @@ void s_send_host(SOCK c_sock, char* hostname, char* command, char* target, char*
 
 //Wrapper over s_send_host - sends the server hostname instead of a user's hostname
 //For use when sending server messages
-void s_send(SOCK c_sock, char* command, char* target, char* message) {
-    s_send_host(c_sock, server_name, command, target, message);
+void sock_send(SOCK c_sock, char* command, char* target, char* message) {
+    sock_send_host(c_sock, server_name, command, target, message);
 }
 
-int s_recv(SOCK c_sock, char* message) {
+int sock_recv(SOCK c_sock, char* message) {
     int recvbytes;
     int totalrecv = 0;
     do {
@@ -164,7 +164,7 @@ int s_recv(SOCK c_sock, char* message) {
     } while (recvbytes > 0);
 }
 
-void s_close(SOCK c_sock) {
+void sock_close(SOCK c_sock) {
     #ifdef _WIN32
     closesocket(c_sock);
     #else

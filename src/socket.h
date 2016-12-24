@@ -11,10 +11,10 @@
 
 SOCK server_setup();
 void server_shutdown();
-SOCK s_accept(SOCK);
-void s_send_host(SOCK, char*, char*, char*, char*);
-void s_send(SOCK, char*, char*, char*);
-int s_recv(SOCK, char*);
-void s_close(SOCK);
+SOCK sock_accept(SOCK);
+void sock_send_host(SOCK, char*, char*, char*, char*);
+void sock_send(SOCK, char*, char*, char*);
+int sock_recv(SOCK, char*);
+void sock_close(SOCK);
 
 #endif // SOCKET_H_INCLUDED

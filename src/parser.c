@@ -59,7 +59,15 @@ void handle_connection(struct user* hc) {
 
         char* strptr;
         char* command = strtok_r(hc->message, " ", &strptr);
-        if(strcmp(command, "JOIN") == 0) {
+        if(strcmp(command, "CAP") == 0) {
+            command = strtok_r(NULL, " ", &strptr);
+
+            if(strcmp(command, "LS") == 0) {
+                //We don't support any IRCv3 capabilities, so send an empty parameter
+                sock_send(hc->c_sock, "CAP", "*", "LS :");
+            }
+        }
+        else if(strcmp(command, "JOIN") == 0) {
             join_channel(&channels, hc, strtok_r(NULL, " ", &strptr));
         }
     }

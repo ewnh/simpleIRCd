@@ -35,7 +35,7 @@ char* strtok_r(char *str, const char *delim, char **nextp) {
 
     str += strspn(str, delim);
     if (*str == '\0') {
-        return NULL;
+        return str;
     }
 
     ret = str;
@@ -57,12 +57,9 @@ void handle_connection(struct user* hc) {
         }
         printf("%i: %s\n", hc->c_sock, hc->message);
 
-        if(strlen(hc->message) == 0) {
-            continue;
-        }
-
         char* strptr;
-        if(strcmp(strtok_r(hc->message, " ", &strptr), "JOIN") == 0) {
+        char* command = strtok_r(hc->message, " ", &strptr);
+        if(strcmp(command, "JOIN") == 0) {
             join_channel(&channels, hc, strtok_r(NULL, " ", &strptr));
         }
     }

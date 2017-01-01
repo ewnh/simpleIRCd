@@ -14,20 +14,21 @@
 struct channel* channels = NULL;
 
 void handle_connection(struct user* hc) {
+    char message[513];
     char recvbuffer[513];
     memset(recvbuffer, '\0', 513);
     char* buffptr = &recvbuffer[0];
 
     while(1) {
-        memset(hc->message, 0, 513);
-        int recvstat = sock_recv(hc->c_sock, hc->message, recvbuffer, &buffptr);
+        memset(message, 0, 513);
+        int recvstat = sock_recv(hc->c_sock, message, recvbuffer, &buffptr);
         if(recvstat == 1) {
             break;
         }
-        printf("%i: %s\n", hc->c_sock, hc->message);
+        printf("%i: %s\n", hc->c_sock, message);
 
         char* strptr;
-        char* command = strtok_r(hc->message, " ", &strptr);
+        char* command = strtok_r(message, " ", &strptr);
 
         if(strcmp(command, "CAP") == 0) {
             command = strtok_r(NULL, " ", &strptr);

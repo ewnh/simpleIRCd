@@ -41,6 +41,26 @@ void handle_connection(struct user* hc) {
         else if(strcmp(command, "NICK") == 0) {
             strcpy(hc->nick, strtok_r(NULL, " ", &strptr));
         }
+        else if(strcmp(command, "USER") == 0) {
+            strcpy(hc->username, strtok_r(NULL, " ", &strptr));
+
+            memset(hc->modes, '\0', 7);
+            //If strtok_r doesn't return an int, or returns 0, ignore
+            if(atoi(strtok_r(NULL, " ", &strptr)) == 8) {
+                //Set user as invisible
+                hc->modes[0] = 'i';
+            }
+
+            //Ignore next parameter; not used
+            strtok_r(NULL, " ", &strptr);
+
+            char* realnm = strtok_r(NULL, " ", &strptr);
+            strcpy(hc->realname, realnm++);
+
+        }
+        else if(strcmp(command, "TEST") == 0) {
+            printf("USER: %s\nMODES: %s\nREALNAME: %s\n", hc->username, hc->modes, hc->realname);
+        }
         else if(strcmp(command, "JOIN") == 0) {
             join_channel(&channels, hc, strtok_r(NULL, " ", &strptr));
         }

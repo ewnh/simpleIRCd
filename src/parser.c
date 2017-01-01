@@ -13,45 +13,14 @@
 
 struct channel* channels = NULL;
 
-/*
- * public domain strtok_r() by Charlie Gordon
- *
- *   from comp.lang.c  9/14/2007
- *
- *      http://groups.google.com/group/comp.lang.c/msg/2ab1ecbb86646684
- *
- *     (Declaration that it's public domain):
- *      http://groups.google.com/group/comp.lang.c/msg/7c7b39328fefab9c
- */
-
-//Unfortunately, MinGW does not contain an implementation of strtok_r
-
-char* strtok_r(char *str, const char *delim, char **nextp) {
-    char *ret;
-
-    if (str == NULL) {
-        str = *nextp;
-    }
-
-    str += strspn(str, delim);
-    if (*str == '\0') {
-        return str;
-    }
-
-    ret = str;
-    str += strcspn(str, delim);
-    if (*str) {
-        *str++ = '\0';
-    }
-
-    *nextp = str;
-    return ret;
-}
-
 void handle_connection(struct user* hc) {
+    char recvbuffer[513];
+    memset(recvbuffer, '\0', 513);
+    char* buffptr = &recvbuffer[0];
+
     while(1) {
         memset(hc->message, 0, 513);
-        int recvstat = sock_recv(hc->c_sock, hc->message);
+        int recvstat = sock_recv(hc->c_sock, hc->message, recvbuffer, &buffptr);
         if(recvstat == 1) {
             break;
         }
@@ -59,6 +28,7 @@ void handle_connection(struct user* hc) {
 
         char* strptr;
         char* command = strtok_r(hc->message, " ", &strptr);
+
         if(strcmp(command, "CAP") == 0) {
             command = strtok_r(NULL, " ", &strptr);
 
@@ -71,6 +41,7 @@ void handle_connection(struct user* hc) {
             join_channel(&channels, hc, strtok_r(NULL, " ", &strptr));
         }
     }
+
     printf("Connection closed\n");
     sock_close(hc->c_sock);
     free(hc);

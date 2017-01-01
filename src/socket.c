@@ -13,6 +13,8 @@
 
 #endif
 
+#include "socket.h"
+
 char server_name[256];
 
 SOCK server_setup() {
@@ -139,28 +141,27 @@ void sock_send(SOCK c_sock, char* command, char* target, char* message) {
     sock_send_host(c_sock, server_name, command, target, message);
 }
 
-int sock_recv(SOCK c_sock, char* message) {
-    int recvbytes;
-    int totalrecv = 0;
+int sock_recv(SOCK c_sock, char* message, char* buffer, char** strptr){
+    int recvbytes = 1;
     do {
+        if(**strptr == '\0') {
+            *strptr = &buffer[0];
+            memset(buffer, '\0', 513);
 
-    	#ifdef _WIN32
-        recvbytes = recv(c_sock, &message[totalrecv], 512-totalrecv, 0);
-    	#else
-        recvbytes = read(c_sock, &message[totalrecv], 512-totalrecv);
-       	#endif
+            #ifdef _WIN32
+            recvbytes = recv(c_sock, buffer, 512, 0);
+            #else
+            recvbytes = read(c_sock, buffer, 512);
+            #endif
+        }
+
        	if(recvbytes == 0) {
             return 1;
        	}
 
-        totalrecv += recvbytes;
+        strcpy(message, strtok_r(NULL, "\r", strptr));
+        return 0;
 
-        for(int i = 0; i < 512; i++) {
-            if(message[i] == '\r' && message[i+1] == '\n') {
-                message[i] = '\0';
-                return 0;
-            }
-        }
     } while (recvbytes > 0);
 }
 
@@ -170,4 +171,42 @@ void sock_close(SOCK c_sock) {
     #else
     close(c_sock);
     #endif
+}
+
+/*
+ * public domain strtok_r() by Charlie Gordon
+ *
+ *   from comp.lang.c  9/14/2007
+ *
+ *      http://groups.google.com/group/comp.lang.c/msg/2ab1ecbb86646684
+ *
+ *     (Declaration that it's public domain):
+ *      http://groups.google.com/group/comp.lang.c/msg/7c7b39328fefab9c
+ */
+
+//Unfortunately, MinGW does not contain an implementation of strtok_r
+
+char* strtok_r(char *str, const char *delim, char **nextp) {
+    char *ret;
+
+    if (str == NULL) {
+        str = *nextp;
+    }
+
+    str += strspn(str, delim);
+    if (*str == '\0') {
+        return str;
+    }
+
+    ret = str;
+    str += strcspn(str, delim);
+    if (*str) {
+        *str++ = '\0';
+        if(*delim == '\r') {
+            *str++ = '\0';
+        }
+    }
+
+    *nextp = str;
+    return ret;
 }

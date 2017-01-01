@@ -14,7 +14,8 @@ void server_shutdown();
 SOCK sock_accept(SOCK);
 void sock_send_host(SOCK, char*, char*, char*, char*);
 void sock_send(SOCK, char*, char*, char*);
-int sock_recv(SOCK, char*);
+int sock_recv(SOCK, char*, char*, char**);
 void sock_close(SOCK);
+char* strtok_r(char *, const char *, char **);
 
 #endif // SOCKET_H_INCLUDED

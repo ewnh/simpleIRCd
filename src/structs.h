@@ -6,6 +6,7 @@
 
 struct user {
     SOCK c_sock;
+    char nick[9];
 };
 
 struct channel {

@@ -38,6 +38,9 @@ void handle_connection(struct user* hc) {
                 sock_send(hc->c_sock, "CAP", "*", "LS :");
             }
         }
+        else if(strcmp(command, "NICK") == 0) {
+            strcpy(hc->nick, strtok_r(NULL, " ", &strptr));
+        }
         else if(strcmp(command, "JOIN") == 0) {
             join_channel(&channels, hc, strtok_r(NULL, " ", &strptr));
         }

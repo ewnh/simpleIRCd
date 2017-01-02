@@ -6,6 +6,7 @@
 
 struct user {
     SOCK c_sock;
+    int is_cap_negotiating;
     char nick[10];
     char username[20];
     char realname[20];

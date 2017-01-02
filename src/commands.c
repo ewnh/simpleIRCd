@@ -2,6 +2,9 @@
 
 #include "structs.h"
 
+extern char* server_name; //defined in socket.c
+extern char* startup_time;
+
 void join_channel(struct channel** channels, struct user* hc, char* name) {
 
     if(strlen(name) > 50) {
@@ -32,4 +35,16 @@ void join_channel(struct channel** channels, struct user* hc, char* name) {
         }
     }
     printf("Joined channel %s\n", name);
+}
+
+void send_registration_messages(SOCK c_sock, char* nick, char* username) {
+    char tempbuffer[128];
+    sprintf(tempbuffer, "Welcome to the Internet Relay Network %s!%s", nick, username);
+    sock_send(c_sock, "001", nick, tempbuffer);
+    sprintf(tempbuffer, "Your host is %s, running simpleIRCd", &server_name);
+    sock_send(c_sock, "002", nick, tempbuffer);
+    sprintf(tempbuffer, "This server was started %s", &startup_time);
+    sock_send(c_sock, "003", nick, tempbuffer);
+    sprintf(tempbuffer, "%s simpleIRCd TODO", &server_name);
+    sock_send(c_sock, "004", nick, tempbuffer);
 }

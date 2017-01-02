@@ -6,7 +6,7 @@
 
 struct user {
     SOCK c_sock;
-    char nick[9];
+    char nick[10];
     char username[20];
     char realname[20];
     char modes[7];

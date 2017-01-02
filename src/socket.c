@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #ifdef _WIN32
 #include <winsock2.h>
@@ -16,6 +17,13 @@
 #include "socket.h"
 
 char server_name[256];
+char startup_time[256];
+
+void set_time() {
+    time_t curtime;
+    time(&curtime);
+    strcpy(startup_time, ctime(&curtime));
+}
 
 SOCK server_setup() {
 
@@ -68,6 +76,9 @@ SOCK server_setup() {
 	#endif
 
 	printf("Bind complete\n");
+
+	set_time();
+
 	return sock;
 }
 

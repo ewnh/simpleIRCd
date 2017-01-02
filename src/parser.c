@@ -11,6 +11,8 @@
 #include "parser.h"
 #include "commands.h"
 
+extern char* server_name; //defined in socket.c
+extern char* startup_time;
 struct channel* channels = NULL;
 
 void handle_connection(struct user* hc) {
@@ -37,9 +39,21 @@ void handle_connection(struct user* hc) {
                 //We don't support any IRCv3 capabilities, so send an empty parameter
                 sock_send(hc->c_sock, "CAP", "*", "LS :");
             }
+            else if(strcmp(command, "END") == 0) {
+                char tempbuffer[128];
+                sprintf(tempbuffer, "Welcome to the Internet Relay Network %s!%s", hc->nick, hc->username);
+                sock_send(hc->c_sock, "001", hc->nick, tempbuffer);
+                sprintf(tempbuffer, "Your host is %s, running simpleIRCd", &server_name);
+                sock_send(hc->c_sock, "002", hc->nick, tempbuffer);
+                sprintf(tempbuffer, "This server was started %s", &startup_time);
+                sock_send(hc->c_sock, "003", hc->nick, tempbuffer);
+                sprintf(tempbuffer, "%s simpleIRCd TODO", &server_name);
+                sock_send(hc->c_sock, "004", hc->nick, tempbuffer);
+            }
         }
         else if(strcmp(command, "NICK") == 0) {
             strcpy(hc->nick, strtok_r(NULL, " ", &strptr));
+
         }
         else if(strcmp(command, "USER") == 0) {
             strcpy(hc->username, strtok_r(NULL, " ", &strptr));

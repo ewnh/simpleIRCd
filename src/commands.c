@@ -47,4 +47,10 @@ void send_registration_messages(SOCK c_sock, char* nick, char* username) {
     sock_send(c_sock, "003", nick, tempbuffer);
     sprintf(tempbuffer, "%s simpleIRCd TODO", &server_name);
     sock_send(c_sock, "004", nick, tempbuffer);
+
+    //MOTD
+    sprintf(tempbuffer, ":- %s Message of the day - ", &server_name);
+    sock_send(c_sock, "375", nick, tempbuffer);
+    sock_send(c_sock, "372", nick, ":- MOTD goes here");
+    sock_send(c_sock, "376", nick, ":End of MOTD command");
 }

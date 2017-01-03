@@ -11,6 +11,7 @@
 #include "parser.h"
 #include "commands.h"
 
+extern char server_name;
 struct channel* channels = NULL;
 
 void handle_connection(struct user* hc) {
@@ -33,7 +34,10 @@ void handle_connection(struct user* hc) {
         char* strptr;
         char* command = strtok_r(message, " ", &strptr);
 
-        if(strcmp(command, "CAP") == 0) {
+        if(strcmp(command, "PING") == 0) {
+            sock_send(hc->c_sock, "PONG", &server_name, strtok_r(NULL, " ", &strptr));
+        }
+        else if(strcmp(command, "CAP") == 0) {
             command = strtok_r(NULL, " ", &strptr);
 
             if(strcmp(command, "LS") == 0) {
@@ -47,7 +51,6 @@ void handle_connection(struct user* hc) {
         }
         else if(strcmp(command, "NICK") == 0) {
             strcpy(hc->nick, strtok_r(NULL, " ", &strptr));
-
         }
         else if(strcmp(command, "USER") == 0) {
             strcpy(hc->username, strtok_r(NULL, " ", &strptr));
@@ -69,7 +72,6 @@ void handle_connection(struct user* hc) {
             if(hc->is_cap_negotiating == 0) {
                 send_registration_messages(hc->c_sock, hc->nick, hc->username);
             }
-
         }
         else if(strcmp(command, "TEST") == 0) {
             printf("USER: %s\nMODES: %s\nREALNAME: %s\n", hc->username, hc->modes, hc->realname);

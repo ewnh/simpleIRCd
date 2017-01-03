@@ -2,8 +2,8 @@
 
 #include "structs.h"
 
-extern char* server_name; //defined in socket.c
-extern char* startup_time;
+extern char server_name; //defined in socket.c
+extern char startup_time;
 
 void join_channel(struct channel** channels, struct user* hc, char* name) {
 

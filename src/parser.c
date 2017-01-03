@@ -34,7 +34,13 @@ void handle_connection(struct user* hc) {
         char* strptr;
         char* command = strtok_r(message, " ", &strptr);
 
-        if(strcmp(command, "PING") == 0) {
+        if(strcmp(command, "PRIVMSG") == 0) {
+            //Can't guarantee order of execution
+            char* target = strtok_r(NULL, " ", &strptr);
+            char* message = strtok_r(NULL, " ", &strptr);
+            send_privmsg(&channels, target, hc->nick, message);
+        }
+        else if(strcmp(command, "PING") == 0) {
             sock_send(hc->c_sock, "PONG", &server_name, strtok_r(NULL, " ", &strptr));
         }
         else if(strcmp(command, "CAP") == 0) {

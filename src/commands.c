@@ -37,6 +37,26 @@ void join_channel(struct channel** channels, struct user* hc, char* name) {
     printf("Joined channel %s\n", name);
 }
 
+void send_privmsg(struct channel** channels, char* target, char* sender, char* raw_message) {
+
+    struct channel* chn;
+    HASH_FIND_STR(*channels, target, chn);
+
+    if(chn == NULL) {
+        return;
+    }
+
+    char message[513] = ":";
+    strcat(message, raw_message);
+
+    for(int i = 0; i < 10; i++) {
+        if(chn->users[i] == NULL) {
+            return;
+        }
+        sock_send_host(chn->users[i]->c_sock, sender, "PRIVMSG", target, message);
+    }
+}
+
 void send_registration_messages(SOCK c_sock, char* nick, char* username) {
     char tempbuffer[128];
     sprintf(tempbuffer, "Welcome to the Internet Relay Network %s!%s", nick, username);

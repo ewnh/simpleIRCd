@@ -1,9 +1,21 @@
 #include <stdio.h>
 
+#include "socket.h"
 #include "structs.h"
 
 extern char server_name; //defined in socket.c
 extern char startup_time;
+
+void send_to_channel(struct channel* chn, char* hostname, char* command, char* target, char* message) {
+    for(int i = 0; i < 10; i++) {
+        if(chn->users[i] == NULL) {
+            return;
+        }
+        else {
+            sock_send_host(chn->users[i]->c_sock, hostname, command, target, message);
+        }
+    }
+}
 
 void join_channel(struct channel** channels, struct user* hc, char* name) {
 
@@ -35,6 +47,8 @@ void join_channel(struct channel** channels, struct user* hc, char* name) {
         }
     }
     printf("Joined channel %s\n", name);
+
+    send_to_channel(chn, hc->nick, "JOIN", name, "");
 }
 
 void send_privmsg(struct channel** channels, char* target, char* sender, char* raw_message) {
@@ -49,12 +63,7 @@ void send_privmsg(struct channel** channels, char* target, char* sender, char* r
     char message[513] = ":";
     strcat(message, raw_message);
 
-    for(int i = 0; i < 10; i++) {
-        if(chn->users[i] == NULL) {
-            return;
-        }
-        sock_send_host(chn->users[i]->c_sock, sender, "PRIVMSG", target, message);
-    }
+    send_to_channel(chn, sender, "PRIVMSG", target, message);
 }
 
 void send_registration_messages(SOCK c_sock, char* nick, char* username) {

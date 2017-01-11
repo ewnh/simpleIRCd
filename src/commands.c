@@ -11,9 +11,13 @@ void send_to_channel(struct channel* chn, char* hostname, char* command, char* t
         if(chn->users[i] == NULL) {
             return;
         }
-        else {
-            sock_send_host(chn->users[i]->c_sock, hostname, command, target, message);
+
+        //Don't send PRIVMSG commands back to the sender
+        if(strcmp(hostname, chn->users[i]->nick) == 0 && strcmp(command, "PRIVMSG") == 0) {
+            continue;
         }
+
+        sock_send_host(chn->users[i]->c_sock, hostname, command, target, message);
     }
 }
 
@@ -60,10 +64,7 @@ void send_privmsg(struct channel** channels, char* target, char* sender, char* r
         return;
     }
 
-    char message[513] = ":";
-    strcat(message, raw_message);
-
-    send_to_channel(chn, sender, "PRIVMSG", target, message);
+    send_to_channel(chn, sender, "PRIVMSG", target, raw_message);
 }
 
 void send_registration_messages(SOCK c_sock, char* nick, char* username) {

@@ -166,7 +166,7 @@ int sock_recv(SOCK c_sock, char* message, char* buffer, char** strptr){
             #endif
         }
 
-       	if(recvbytes == 0) {
+       	if(recvbytes <= 0) {
             return 1;
        	}
 

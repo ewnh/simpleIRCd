@@ -153,27 +153,38 @@ void sock_send(SOCK c_sock, char* command, char* target, char* message) {
 }
 
 int sock_recv(SOCK c_sock, char* message, char* buffer, char** strptr){
-    int recvbytes = 1;
-    do {
+    while(1) {
         if(**strptr == '\0') {
             *strptr = &buffer[0];
             memset(buffer, '\0', 513);
 
-            #ifdef _WIN32
-            recvbytes = recv(c_sock, buffer, 512, 0);
-            #else
-            recvbytes = read(c_sock, buffer, 512);
-            #endif
-        }
+            int recvbytes = 0;
+            int totalbytes = 0;
 
-       	if(recvbytes <= 0) {
-            return 1;
-       	}
+            while(1) {
+
+                #ifdef _WIN32
+                recvbytes = recv(c_sock, &buffer[totalbytes], 512, 0);
+                #else
+                recvbytes = read(c_sock, &buffer[totalbytes], 512);
+                #endif
+
+                //Connection closed
+                if(recvbytes <= 0) {
+                    return 1;
+                }
+
+                totalbytes += recvbytes;
+                //Check if the last two received characters are \r\n
+                if(buffer[totalbytes-2] == '\r' && buffer[totalbytes-1] == '\n') {
+                    break;
+                }
+            }
+        }
 
         strcpy(message, strtok_r(NULL, "\r", strptr));
         return 0;
-
-    } while (recvbytes > 0);
+    }
 }
 
 void sock_close(SOCK c_sock) {

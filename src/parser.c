@@ -8,8 +8,8 @@
 #endif
 
 #include "socket.h"
-#include "parser.h"
 #include "commands.h"
+#include "structs.h"
 
 extern char server_name;
 struct channel* channels = NULL;

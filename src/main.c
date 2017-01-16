@@ -1,7 +1,9 @@
 #include <stdio.h>
 
 #include "socket.h"
-#include "parser.h"
+#include "structs.h"
+
+void start_handle_thread(struct user*);
 
 int main()
 {

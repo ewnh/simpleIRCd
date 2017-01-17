@@ -11,6 +11,7 @@ struct user {
     char username[20];
     char realname[20];
     char modes[7];
+    UT_hash_handle hh;
 };
 
 struct channel {

@@ -13,6 +13,7 @@
 
 extern char server_name;
 struct channel* channels = NULL;
+struct user* users = NULL;
 
 void handle_connection(struct user* hc) {
 
@@ -56,7 +57,9 @@ void handle_connection(struct user* hc) {
             }
         }
         else if(strcmp(command, "NICK") == 0) {
-            strcpy(hc->nick, strtok_r(NULL, " ", &strptr));
+            char* nick = strtok_r(NULL, " ", &strptr);
+            strcpy(hc->nick, nick);
+            HASH_ADD_STR(users, nick, hc);
         }
         else if(strcmp(command, "USER") == 0) {
             strcpy(hc->username, strtok_r(NULL, " ", &strptr));

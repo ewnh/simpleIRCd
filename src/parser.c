@@ -88,6 +88,19 @@ void handle_connection(struct user* hc) {
         else if(strcmp(command, "JOIN") == 0) {
             join_channel(&channels, hc, strtok_r(NULL, " ", &strptr));
         }
+        else if(strcmp(command, "WHOIS") == 0) {
+            char* target = strtok_r(NULL, " ", &strptr);
+            struct user* usr;
+            HASH_FIND_STR(users, target, usr);
+            if(usr == NULL) {
+                return;
+            }
+            char tempbuffer[128];
+            sprintf(tempbuffer, "%s %s %s * :%s", usr->nick, usr->username, "TESTHOST", usr->realname);
+            sock_send(hc->c_sock, "311", hc->nick, tempbuffer);
+            sprintf(tempbuffer, "%s :End of WHOIS list", usr->nick);
+            sock_send(hc->c_sock, "318", hc->nick, tempbuffer);
+        }
     }
 
     printf("Connection closed\n");

@@ -89,19 +89,7 @@ void handle_connection(struct user* hc) {
             join_channel(&channels, hc, strtok_r(NULL, " ", &strptr));
         }
         else if(strcmp(command, "WHOIS") == 0) {
-            char* target = strtok_r(NULL, " ", &strptr);
-            struct user* usr;
-            HASH_FIND_STR(users, target, usr);
-            if(usr == NULL) {
-                return;
-            }
-            char tempbuffer[128];
-            sprintf(tempbuffer, "%s %s %s * :%s", usr->nick, usr->username, "TESTHOST", usr->realname);
-            sock_send(hc->c_sock, "311", hc->nick, tempbuffer);
-            sprintf(tempbuffer, "%s %s :info", usr->nick, &server_name);
-            sock_send(hc->c_sock, "312", hc->nick, tempbuffer);
-            sprintf(tempbuffer, "%s :End of WHOIS list", usr->nick);
-            sock_send(hc->c_sock, "318", hc->nick, tempbuffer);
+            whois_user(&users, hc->c_sock, hc->nick, strtok_r(NULL, " ", &strptr));
         }
     }
 

@@ -84,3 +84,21 @@ void send_registration_messages(SOCK c_sock, char* nick, char* username) {
     sock_send(c_sock, "372", nick, ":- MOTD goes here");
     sock_send(c_sock, "376", nick, ":End of MOTD command");
 }
+
+void whois_user(struct user** users, SOCK c_sock, char* sender, char* target) {
+
+    struct user* usr;
+    HASH_FIND_STR(*users, target, usr);
+
+    if(usr == NULL) {
+        return;
+    }
+
+    char tempbuffer[128];
+    sprintf(tempbuffer, "%s %s %s * :%s", usr->nick, usr->username, "TESTHOST", usr->realname);
+    sock_send(c_sock, "311", sender, tempbuffer);
+    sprintf(tempbuffer, "%s %s :info", usr->nick, &server_name);
+    sock_send(c_sock, "312", sender, tempbuffer);
+    sprintf(tempbuffer, "%s :End of WHOIS list", usr->nick);
+    sock_send(c_sock, "318", sender, tempbuffer);
+}

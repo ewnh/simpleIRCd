@@ -98,6 +98,8 @@ void handle_connection(struct user* hc) {
             char tempbuffer[128];
             sprintf(tempbuffer, "%s %s %s * :%s", usr->nick, usr->username, "TESTHOST", usr->realname);
             sock_send(hc->c_sock, "311", hc->nick, tempbuffer);
+            sprintf(tempbuffer, "%s %s :info", usr->nick, &server_name);
+            sock_send(hc->c_sock, "312", hc->nick, tempbuffer);
             sprintf(tempbuffer, "%s :End of WHOIS list", usr->nick);
             sock_send(hc->c_sock, "318", hc->nick, tempbuffer);
         }

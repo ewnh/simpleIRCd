@@ -102,23 +102,28 @@ void whois_user(struct user** users, SOCK c_sock, char* sender, char* target) {
     }
 
     char tempbuffer[128];
+
+    //Send RPL_WHOISUSER: <nick> <user> <host> * :<real name>
     sprintf(tempbuffer, "%s %s %s * :%s", usr->nick, usr->username, "TESTHOST", usr->realname);
     sock_send(c_sock, "311", sender, tempbuffer);
+
+    //Send RPL_WHOISSERVER: <nick> <server> :<server info>
     sprintf(tempbuffer, "%s %s :info", usr->nick, &server_name);
     sock_send(c_sock, "312", sender, tempbuffer);
 
+    //Send RPL_WHOISCHANNELS: <nick> :*( ( "@" / "+" ) <channel> " " )
     sprintf(tempbuffer, "%s :", usr->nick);
     for(int i = 0; i < 10; i++) {
         if(usr->channels[i] == NULL) {
             break;
         }
-        //printf("PTR: %p\n", usr->channels[i]->name);
-        struct channel* chn = usr->channels[i];
+
         strcat(tempbuffer, usr->channels[i]->name);
         strcat(tempbuffer, " ");
     }
     sock_send(c_sock, "319", sender, tempbuffer);
 
+    //Send RPL_ENDOFWHOIS: <nick> :End of WHOIS list
     sprintf(tempbuffer, "%s :End of WHOIS list", usr->nick);
     sock_send(c_sock, "318", sender, tempbuffer);
 }

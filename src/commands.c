@@ -52,6 +52,12 @@ void join_channel(struct channel** channels, struct user* hc, char* name) {
     }
     printf("Joined channel %s\n", name);
 
+    for(int i = 0; i < 10; i++) {
+        if(hc->channels[i] == NULL) {
+            hc->channels[i] = chn;
+        }
+    }
+
     send_to_channel(chn, hc->nick, "JOIN", name, "");
 }
 

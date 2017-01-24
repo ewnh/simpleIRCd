@@ -55,6 +55,7 @@ void join_channel(struct channel** channels, struct user* hc, char* name) {
     for(int i = 0; i < 10; i++) {
         if(hc->channels[i] == NULL) {
             hc->channels[i] = chn;
+            break;
         }
     }
 
@@ -105,6 +106,19 @@ void whois_user(struct user** users, SOCK c_sock, char* sender, char* target) {
     sock_send(c_sock, "311", sender, tempbuffer);
     sprintf(tempbuffer, "%s %s :info", usr->nick, &server_name);
     sock_send(c_sock, "312", sender, tempbuffer);
+
+    sprintf(tempbuffer, "%s :", usr->nick);
+    for(int i = 0; i < 10; i++) {
+        if(usr->channels[i] == NULL) {
+            break;
+        }
+        //printf("PTR: %p\n", usr->channels[i]->name);
+        struct channel* chn = usr->channels[i];
+        strcat(tempbuffer, usr->channels[i]->name);
+        strcat(tempbuffer, " ");
+    }
+    sock_send(c_sock, "319", sender, tempbuffer);
+
     sprintf(tempbuffer, "%s :End of WHOIS list", usr->nick);
     sock_send(c_sock, "318", sender, tempbuffer);
 }

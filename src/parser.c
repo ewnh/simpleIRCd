@@ -72,7 +72,7 @@ void handle_connection(struct user* hc) {
             strtok_r(NULL, " ", &strptr);
 
             char* realnm = strtok_r(NULL, " ", &strptr);
-            strcpy(hc->realname, realnm++);
+            strcpy(hc->realname, ++realnm);
 
             //If client doesn't want to do IRCv3 capacity negotiation
             if(hc->is_cap_negotiating == 0) {

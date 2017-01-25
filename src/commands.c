@@ -36,6 +36,8 @@ void join_channel(struct channel** channels, struct user* hc, char* name) {
 
         strcpy(chn->name, name);
 
+        chn->topic[0] = '\0';
+
         memset(chn->users, 0, sizeof(chn->users));
         chn->users[0] = hc;
 
@@ -53,6 +55,14 @@ void join_channel(struct channel** channels, struct user* hc, char* name) {
     printf("Joined channel %s\n", name);
 
     send_to_channel(chn, hc->nick, "JOIN", name, "");
+
+    //If channel topic set
+    if(chn->topic[0] != '\0') {
+        char tempbuffer[128];
+        sprintf(tempbuffer, "%s :%s", name, chn->topic);
+        sock_send(hc->c_sock, "332", hc->nick, tempbuffer);
+    }
+    //Don't send a message if no topic set
 }
 
 void send_privmsg(struct channel** channels, char* target, char* sender, char* raw_message) {
@@ -97,7 +107,8 @@ void set_topic(struct channel** channels, char* nick, char* strptr) {
         return;
     }
 
-    strcpy(chn->topic, strtok_r(NULL, " ", &strptr));
+    char* topic = strtok_r(NULL, " ", &strptr);
+    strcpy(chn->topic, ++topic);
 
     send_to_channel(chn, nick, "TOPIC", chn->name, chn->topic);
 }

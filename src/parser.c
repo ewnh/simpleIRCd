@@ -76,21 +76,21 @@ void handle_connection(struct user* hc) {
             strtok_r(NULL, " ", &strptr);
 
             char* realnm = strtok_r(NULL, " ", &strptr);
-            strcpy(hc->realname, realnm++);
+            strcpy(hc->realname, ++realnm);
 
             //If client doesn't want to do IRCv3 capacity negotiation
             if(hc->is_cap_negotiating == 0) {
                 send_registration_messages(hc->c_sock, hc->nick, hc->username);
             }
         }
-        else if(strcmp(command, "TEST") == 0) {
-            printf("USER: %s\nMODES: %s\nREALNAME: %s\n", hc->username, hc->modes, hc->realname);
-        }
         else if(strcmp(command, "JOIN") == 0) {
             join_channel(&channels, hc, strtok_r(NULL, " ", &strptr));
         }
         else if(strcmp(command, "WHOIS") == 0) {
             whois_user(&users, hc->c_sock, hc->nick, strtok_r(NULL, " ", &strptr));
+        }
+        else if(strcmp(command, "TOPIC") == 0) {
+            set_topic(&channels, hc->nick, strptr);
         }
     }
 

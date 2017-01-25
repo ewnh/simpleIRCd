@@ -36,6 +36,8 @@ void join_channel(struct channel** channels, struct user* hc, char* name) {
 
         strcpy(chn->name, name);
 
+        chn->topic[0] = '\0';
+
         memset(chn->users, 0, sizeof(chn->users));
         chn->users[0] = hc;
 
@@ -60,6 +62,14 @@ void join_channel(struct channel** channels, struct user* hc, char* name) {
     }
 
     send_to_channel(chn, hc->nick, "JOIN", name, "");
+
+    //If channel topic set
+    if(chn->topic[0] != '\0') {
+        char tempbuffer[128];
+        sprintf(tempbuffer, "%s :%s", name, chn->topic);
+        sock_send(hc->c_sock, "332", hc->nick, tempbuffer);
+    }
+    //Don't send a message if no topic set
 }
 
 void send_privmsg(struct channel** channels, char* target, char* sender, char* raw_message) {
@@ -126,4 +136,22 @@ void whois_user(struct user** users, SOCK c_sock, char* sender, char* target) {
     //Send RPL_ENDOFWHOIS: <nick> :End of WHOIS list
     sprintf(tempbuffer, "%s :End of WHOIS list", usr->nick);
     sock_send(c_sock, "318", sender, tempbuffer);
+}
+
+void set_topic(struct channel** channels, char* nick, char* strptr) {
+
+    char c_name[50];
+    strcpy(c_name, strtok_r(NULL, " ", &strptr));
+
+    struct channel* chn;
+    HASH_FIND_STR(*channels, c_name, chn);
+
+    if(chn == NULL) {
+        return;
+    }
+
+    char* topic = strtok_r(NULL, " ", &strptr);
+    strcpy(chn->topic, ++topic);
+
+    send_to_channel(chn, nick, "TOPIC", chn->name, chn->topic);
 }

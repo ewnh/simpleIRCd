@@ -15,6 +15,7 @@ struct user {
 
 struct channel {
     char name[50];
+    char topic[50];
     struct user* users[10];
     UT_hash_handle hh;
 };

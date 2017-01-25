@@ -84,3 +84,20 @@ void send_registration_messages(SOCK c_sock, char* nick, char* username) {
     sock_send(c_sock, "372", nick, ":- MOTD goes here");
     sock_send(c_sock, "376", nick, ":End of MOTD command");
 }
+
+void set_topic(struct channel** channels, char* nick, char* strptr) {
+
+    char c_name[50];
+    strcpy(c_name, strtok_r(NULL, " ", &strptr));
+
+    struct channel* chn;
+    HASH_FIND_STR(*channels, c_name, chn);
+
+    if(chn == NULL) {
+        return;
+    }
+
+    strcpy(chn->topic, strtok_r(NULL, " ", &strptr));
+
+    send_to_channel(chn, nick, "TOPIC", chn->name, chn->topic);
+}

@@ -79,11 +79,11 @@ void handle_connection(struct user* hc) {
                 send_registration_messages(hc->c_sock, hc->nick, hc->username);
             }
         }
-        else if(strcmp(command, "TEST") == 0) {
-            printf("USER: %s\nMODES: %s\nREALNAME: %s\n", hc->username, hc->modes, hc->realname);
-        }
         else if(strcmp(command, "JOIN") == 0) {
             join_channel(&channels, hc, strtok_r(NULL, " ", &strptr));
+        }
+        else if(strcmp(command, "TOPIC") == 0) {
+            set_topic(&channels, hc->nick, strptr);
         }
     }
 

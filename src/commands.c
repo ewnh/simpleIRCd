@@ -72,7 +72,10 @@ void join_channel(struct channel** channels, struct user* hc, char* name) {
     //Don't send a message if no topic set
 }
 
-void send_privmsg(struct channel** channels, char* target, char* sender, char* raw_message) {
+void send_privmsg(struct channel** channels, char* sender, char* strptr) {
+
+    char target[50];
+    strcpy(target, strtok_r(NULL, " ", &strptr));
 
     struct channel* chn;
     HASH_FIND_STR(*channels, target, chn);
@@ -81,7 +84,7 @@ void send_privmsg(struct channel** channels, char* target, char* sender, char* r
         return;
     }
 
-    send_to_channel(chn, sender, "PRIVMSG", target, raw_message);
+    send_to_channel(chn, sender, "PRIVMSG", target, strptr);
 }
 
 void send_registration_messages(SOCK c_sock, char* nick, char* username) {
@@ -140,18 +143,17 @@ void whois_user(struct user** users, SOCK c_sock, char* sender, char* target) {
 
 void set_topic(struct channel** channels, char* nick, char* strptr) {
 
-    char c_name[50];
-    strcpy(c_name, strtok_r(NULL, " ", &strptr));
+    char chn_name[50];
+    strcpy(chn_name, strtok_r(NULL, " ", &strptr));
 
     struct channel* chn;
-    HASH_FIND_STR(*channels, c_name, chn);
+    HASH_FIND_STR(*channels, chn_name, chn);
 
     if(chn == NULL) {
         return;
     }
 
-    char* topic = strtok_r(NULL, " ", &strptr);
-    strcpy(chn->topic, ++topic);
+    strcpy(chn->topic, ++strptr);
 
     send_to_channel(chn, nick, "TOPIC", chn->name, chn->topic);
 }

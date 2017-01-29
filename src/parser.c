@@ -89,6 +89,9 @@ void handle_connection(struct user* hc) {
         else if(strcmp(command, "TOPIC") == 0) {
             set_topic(&channels, hc->nick, strptr);
         }
+        else if(strcmp(command, "WHO") == 0) {
+            who_request(&channels, hc, strtok_r(NULL, " ", &strptr));
+        }
     }
 
     printf("Connection closed\n");

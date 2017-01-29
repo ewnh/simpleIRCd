@@ -157,3 +157,28 @@ void set_topic(struct channel** channels, char* nick, char* strptr) {
 
     send_to_channel(chn, nick, "TOPIC", chn->name, chn->topic);
 }
+
+void who_request(struct channel** channels, struct user* usr, char* chn_name) {
+
+    struct channel* chn;
+    HASH_FIND_STR(*channels, chn_name, chn);
+
+    if(chn == NULL) {
+        return;
+    }
+
+    char tempbuffer[128];
+
+    for(int i = 0; i < 10; i++) {
+        if(chn->users[i] == NULL) {
+            break;
+        }
+
+        sprintf(tempbuffer, "%s %s %s %s %s G :%s %s", chn->name, chn->users[i]->username, "TESTHOST", &server_name,
+                chn->users[i]->nick, "0", chn->users[i]->realname);
+        sock_send(usr->c_sock, "352", usr->nick, tempbuffer);
+    }
+
+    sprintf(tempbuffer, "%s :End of WHO list", chn->name);
+    sock_send(usr->c_sock, "315", usr->nick, tempbuffer);
+}

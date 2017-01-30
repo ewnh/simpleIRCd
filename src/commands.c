@@ -182,3 +182,34 @@ void who_request(struct channel** channels, struct user* usr, char* chn_name) {
     sprintf(tempbuffer, "%s :End of WHO list", chn->name);
     sock_send(usr->c_sock, "315", usr->nick, tempbuffer);
 }
+
+void name_reply(struct channel** channels, struct user* usr, char* chn_name) {
+
+    struct channel* chn;
+    HASH_FIND_STR(*channels, chn_name, chn);
+
+    if(chn == NULL) {
+        return;
+    }
+
+    char tempbuffer[128];
+    sprintf(tempbuffer, "= ");
+    strcat(tempbuffer, chn_name);
+    strcat(tempbuffer, " :");
+
+    for(int i = 0; i < 10; i++) {
+        if(chn->users[i] == NULL) {
+            break;
+        }
+
+        strcat(tempbuffer, chn->users[i]->nick);
+        strcat(tempbuffer, " ");
+    }
+
+    //RPL_NAMREPLY
+    sock_send(usr->c_sock, "353", usr->nick, tempbuffer);
+
+    //RPL_ENDOFNAMES
+    sprintf(tempbuffer, "%s :End of NAMES list", chn->name);
+    sock_send(usr->c_sock, "366", usr->nick, tempbuffer);
+}

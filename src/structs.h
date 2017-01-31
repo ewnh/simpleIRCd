@@ -1,7 +1,7 @@
 #ifndef STRUCTS_H_INCLUDED
 #define STRUCTS_H_INCLUDED
 
-#include "uthash.h"
+#include "../lib/uthash.h"
 #include "socket.h"
 
 struct user {

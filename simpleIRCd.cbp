@@ -48,18 +48,17 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/commands.h" />
+		<Unit filename="src/defines.h" />
 		<Unit filename="src/main.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/parser.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="src/parser.h" />
 		<Unit filename="src/socket.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/socket.h" />
-		<Unit filename="src/structs.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

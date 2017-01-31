@@ -27,7 +27,7 @@ void set_time() {
 
 SOCK server_setup() {
 
-	#ifdef _WIN32
+    #ifdef _WIN32
     WSADATA wsa;
 
     if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0) {
@@ -35,7 +35,7 @@ SOCK server_setup() {
         exit(EXIT_FAILURE);
     }
     printf("Initialised Winsock\n");
-	#endif
+    #endif
 
     gethostname(server_name, sizeof(server_name));
 
@@ -49,52 +49,52 @@ SOCK server_setup() {
         printf("Cannot create socket: %d\n", WSAGetLastError());
         exit(EXIT_FAILURE);
     }
-	#else
+    #else
     if(sock < 0) {
         perror("Cannot create socket");
         exit(EXIT_FAILURE);
     }
-	#endif
+    #endif
 
-	printf("Socket Created\n");
+    printf("Socket Created\n");
 
-	server.sin_family = AF_INET;
-	server.sin_addr.s_addr = INADDR_ANY;
-	server.sin_port = htons(10000);
+    server.sin_family = AF_INET;
+    server.sin_addr.s_addr = INADDR_ANY;
+    server.sin_port = htons(10000);
 
-	int err = bind(sock, (struct sockaddr *)&server, sizeof(server));
-	#ifdef _WIN32
+    int err = bind(sock, (struct sockaddr *)&server, sizeof(server));
+    #ifdef _WIN32
     if (err == SOCKET_ERROR) {
         printf("Bind failed: %d\n", WSAGetLastError());
         exit(EXIT_FAILURE);
     }
-	#else
+    #else
     if(err < 0) {
         perror("Bind failed");
         exit(EXIT_FAILURE);
     }
-	#endif
+    #endif
 
-	printf("Bind complete\n");
+    printf("Bind complete\n");
 
-	set_time();
+    set_time();
 
-	return sock;
+    return sock;
 }
 
 void server_shutdown() {
     #ifdef _WIN32
     WSACleanup();
-	#endif
+    #endif
 }
 
 SOCK sock_accept(SOCK sock) {
     struct sockaddr_in client;
 
-	listen(sock, 1);
-	printf("Waiting\n");
+    listen(sock, 1);
+    printf("Waiting\n");
 
-	int c = sizeof(struct sockaddr_in);
+    int c = sizeof(struct sockaddr_in);
     SOCK c_sock = accept(sock, (struct sockaddr *)&client, &c);
 
     #ifdef _WIN32
@@ -102,15 +102,15 @@ SOCK sock_accept(SOCK sock) {
         printf("Accept failed: %d\n", ERROR);
         exit(EXIT_FAILURE);
     }
-	#else
+    #else
     if(c_sock < 0) {
         perror("Accept failed");
         exit(EXIT_FAILURE);
     }
-	#endif
-	printf("Connection accepted\n");
+    #endif
+    printf("Connection accepted\n");
 
-	return c_sock;
+    return c_sock;
 }
 
 void sock_send_host(SOCK c_sock, char* hostname, char* command, char* target, char* message) {
@@ -138,12 +138,12 @@ void sock_send_host(SOCK c_sock, char* hostname, char* command, char* target, ch
         printf("Send failed: %d\n", WSAGetLastError());
         exit(EXIT_FAILURE);
     }
-	#else
+    #else
     if(write(c_sock, response, strlen(response)) < 0) {
         perror("Send failed\n");
         exit(EXIT_FAILURE);
     }
-	#endif
+    #endif
 }
 
 //Wrapper over s_send_host - sends the server hostname instead of a user's hostname

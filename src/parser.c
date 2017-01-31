@@ -95,6 +95,9 @@ void handle_connection(struct user* hc) {
         else if(strcmp(command, "NAMES") == 0) {
             name_reply(&channels, hc, strtok_r(NULL, " ", &strptr));
         }
+        else if(strcmp(command, "PART") == 0) {
+            user_part(&channels, hc, strptr);
+        }
     }
 
     printf("Connection closed\n");

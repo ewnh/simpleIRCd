@@ -217,3 +217,34 @@ void name_reply(struct channel** channels, struct user* usr, char* chn_name) {
     sprintf(tempbuffer, "%s :End of NAMES list", chn->name);
     sock_send(usr->c_sock, "366", usr->nick, tempbuffer);
 }
+
+void user_part(struct channel** channels, struct user* usr, char* strptr) {
+
+	char chn_name[50];
+	strcpy(chn_name, strtok_r(NULL, " ", &strptr));
+
+    struct channel* chn;
+    HASH_FIND_STR(*channels, chn_name, chn);
+
+    if(chn == NULL) {
+		return;
+    }
+
+    for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
+		if(chn->users[i] == NULL && usr->channels[i] == NULL) {
+			break;
+		}
+
+		//Remove user from channel's users list
+		if(chn->users[i] == usr) {
+			chn->users[i] = NULL;
+		}
+
+		//Remove channel from user's channel list
+		if(usr->channels[i] == chn) {
+			usr->channels[i] = NULL;
+		}
+    }
+
+    send_to_channel(chn, usr->nick, "PART", chn_name, strtok_r(NULL, " ", &strptr));
+}

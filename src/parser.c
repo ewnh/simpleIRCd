@@ -9,7 +9,7 @@
 
 #include "socket.h"
 #include "commands.h"
-#include "structs.h"
+#include "defines.h"
 
 extern char server_name;
 struct channel* channels = NULL;

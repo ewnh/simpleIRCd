@@ -2,13 +2,13 @@
 
 #include "commands.h"
 #include "socket.h"
-#include "structs.h"
+#include "defines.h"
 
 extern char server_name; //defined in socket.c
 extern char startup_time;
 
 void send_to_channel(struct channel* chn, char* hostname, char* command, char* target, char* message) {
-    for(int i = 0; i < 10; i++) {
+    for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
         if(chn->users[i] == NULL) {
             return;
         }
@@ -46,7 +46,7 @@ void join_channel(struct channel** channels, struct user* hc, char* name) {
         }
 
     else {
-        for(int i = 0; i < 10; i++) {
+        for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
             if(chn->users[i] == NULL) {
                 chn->users[i] = hc;
                 break;
@@ -55,7 +55,7 @@ void join_channel(struct channel** channels, struct user* hc, char* name) {
     }
     printf("Joined channel %s\n", name);
 
-    for(int i = 0; i < 10; i++) {
+    for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
         if(hc->channels[i] == NULL) {
             hc->channels[i] = chn;
             break;
@@ -130,7 +130,7 @@ void whois_user(struct user** users, SOCK c_sock, char* sender, char* target) {
 
     //Send RPL_WHOISCHANNELS: <nick> :*( ( "@" / "+" ) <channel> " " )
     sprintf(tempbuffer, "%s :", usr->nick);
-    for(int i = 0; i < 10; i++) {
+    for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
         if(usr->channels[i] == NULL) {
             break;
         }
@@ -173,7 +173,7 @@ void who_request(struct channel** channels, struct user* usr, char* chn_name) {
 
     char tempbuffer[128];
 
-    for(int i = 0; i < 10; i++) {
+    for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
         if(chn->users[i] == NULL) {
             break;
         }
@@ -201,7 +201,7 @@ void name_reply(struct channel** channels, struct user* usr, char* chn_name) {
     strcat(tempbuffer, chn_name);
     strcat(tempbuffer, " :");
 
-    for(int i = 0; i < 10; i++) {
+    for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
         if(chn->users[i] == NULL) {
             break;
         }

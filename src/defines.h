@@ -4,6 +4,8 @@
 #include "../lib/uthash.h"
 #include "socket.h"
 
+#define CHANNEL_MAX_USERS 100
+
 struct user {
     SOCK c_sock;
     int is_cap_negotiating;
@@ -11,14 +13,14 @@ struct user {
     char username[20];
     char realname[20];
     char modes[7];
-    struct channel* channels[10];
+    struct channel* channels[CHANNEL_MAX_USERS];
     UT_hash_handle hh;
 };
 
 struct channel {
     char name[50];
     char topic[50];
-    struct user* users[10];
+    struct user* users[CHANNEL_MAX_USERS];
     UT_hash_handle hh;
 };
 

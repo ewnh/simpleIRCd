@@ -1,5 +1,6 @@
 #include <stdio.h>
 
+#include "commands.h"
 #include "socket.h"
 #include "structs.h"
 
@@ -70,6 +71,9 @@ void join_channel(struct channel** channels, struct user* hc, char* name) {
         sock_send(hc->c_sock, "332", hc->nick, tempbuffer);
     }
     //Don't send a message if no topic set
+
+    //Send names message
+    name_reply(channels, hc, name);
 }
 
 void send_privmsg(struct channel** channels, char* sender, char* strptr) {

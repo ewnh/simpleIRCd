@@ -248,3 +248,28 @@ void user_part(struct channel** channels, struct user* usr, char* strptr) {
 
     send_to_channel(chn, usr->nick, "PART", chn_name, strtok_r(NULL, " ", &strptr));
 }
+
+void user_quit(struct user* usr, char* message) {
+
+    //Loop over every channel the user belongs to
+    for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
+        if(usr->channels[i] == NULL) {
+            return;
+        }
+
+        //Loop over users in that channel and remove usr
+        for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
+            if(usr->channels[i]->users[i] == NULL) {
+                break;
+            }
+
+            if(usr->channels[i]->users[i] == usr) {
+                usr->channels[i]->users[i] == NULL;
+                send_to_channel(usr->channels[i], usr->nick, "QUIT", usr->channels[i]->name, message);
+                break;
+            }
+        }
+    }
+
+    sock_send(usr->c_sock, "ERROR", "", ":Client quit");
+}

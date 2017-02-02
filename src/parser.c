@@ -98,6 +98,10 @@ void handle_connection(struct user* hc) {
         else if(strcmp(command, "PART") == 0) {
             user_part(&channels, hc, strptr);
         }
+        else if(strcmp(command, "QUIT") == 0) {
+            user_quit(hc, strtok_r(NULL, " ", &strptr));
+            break;
+        }
     }
 
     printf("Connection closed\n");

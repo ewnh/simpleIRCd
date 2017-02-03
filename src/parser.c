@@ -37,7 +37,7 @@ void handle_connection(struct user* hc) {
         char* command = strtok_r(message, " ", &strptr);
 
         if(strcmp(command, "PRIVMSG") == 0) {
-            send_privmsg(&channels, hc->nick, strptr);
+            send_privmsg(hc->nick, strptr);
         }
         else if(strcmp(command, "PING") == 0) {
             sock_send(hc->c_sock, "PONG", &server_name, strtok_r(NULL, " ", &strptr));
@@ -81,22 +81,22 @@ void handle_connection(struct user* hc) {
             }
         }
         else if(strcmp(command, "JOIN") == 0) {
-            join_channel(&channels, hc, strtok_r(NULL, " ", &strptr));
+            join_channel(hc, strtok_r(NULL, " ", &strptr));
         }
         else if(strcmp(command, "WHOIS") == 0) {
             whois_user(&users, hc->c_sock, hc->nick, strtok_r(NULL, " ", &strptr));
         }
         else if(strcmp(command, "TOPIC") == 0) {
-            set_topic(&channels, hc->nick, strptr);
+            set_topic(hc->nick, strptr);
         }
         else if(strcmp(command, "WHO") == 0) {
-            who_request(&channels, hc, strtok_r(NULL, " ", &strptr));
+            who_request(hc, strtok_r(NULL, " ", &strptr));
         }
         else if(strcmp(command, "NAMES") == 0) {
-            name_reply(&channels, hc, strtok_r(NULL, " ", &strptr));
+            name_reply(hc, strtok_r(NULL, " ", &strptr));
         }
         else if(strcmp(command, "PART") == 0) {
-            user_part(&channels, hc, strptr);
+            user_part(hc, strptr);
         }
         else if(strcmp(command, "QUIT") == 0) {
             user_quit(hc, strtok_r(NULL, " ", &strptr));

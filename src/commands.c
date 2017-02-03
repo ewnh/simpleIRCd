@@ -6,6 +6,7 @@
 
 extern char server_name; //defined in socket.c
 extern char startup_time;
+extern struct channel* channels;
 
 void send_to_channel(struct channel* chn, char* hostname, char* command, char* target, char* message) {
     for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
@@ -22,7 +23,19 @@ void send_to_channel(struct channel* chn, char* hostname, char* command, char* t
     }
 }
 
-void join_channel(struct channel** channels, struct user* hc, char* name) {
+struct channel* get_channel(char* chn_name) {
+
+    struct channel* chn;
+    HASH_FIND_STR(channels, chn_name, chn);
+
+    if(chn == NULL) {
+        return NULL;
+    }
+
+    return chn;
+}
+
+void join_channel(struct user* hc, char* name) {
 
     if(strlen(name) > 50) {
         printf("Channel name too long\n");
@@ -30,7 +43,7 @@ void join_channel(struct channel** channels, struct user* hc, char* name) {
     }
 
     struct channel* chn;
-    HASH_FIND_STR(*channels, name, chn);
+    HASH_FIND_STR(channels, name, chn);
 
     if(chn == NULL) { //channel doesn't already exist
         chn = malloc(sizeof(struct channel));
@@ -42,7 +55,7 @@ void join_channel(struct channel** channels, struct user* hc, char* name) {
         memset(chn->users, 0, sizeof(chn->users));
         chn->users[0] = hc;
 
-        HASH_ADD_STR(*channels, name, chn);
+        HASH_ADD_STR(channels, name, chn);
         }
 
     else {
@@ -73,16 +86,15 @@ void join_channel(struct channel** channels, struct user* hc, char* name) {
     //Don't send a message if no topic set
 
     //Send names message
-    name_reply(channels, hc, name);
+    name_reply(hc, name);
 }
 
-void send_privmsg(struct channel** channels, char* sender, char* strptr) {
+void send_privmsg(char* sender, char* strptr) {
 
     char target[50];
     strcpy(target, strtok_r(NULL, " ", &strptr));
 
-    struct channel* chn;
-    HASH_FIND_STR(*channels, target, chn);
+    struct channel* chn = get_channel(target);
 
     if(chn == NULL) {
         return;
@@ -145,13 +157,9 @@ void whois_user(struct user** users, SOCK c_sock, char* sender, char* target) {
     sock_send(c_sock, "318", sender, tempbuffer);
 }
 
-void set_topic(struct channel** channels, char* nick, char* strptr) {
+void set_topic(char* nick, char* strptr) {
 
-    char chn_name[50];
-    strcpy(chn_name, strtok_r(NULL, " ", &strptr));
-
-    struct channel* chn;
-    HASH_FIND_STR(*channels, chn_name, chn);
+    struct channel* chn = get_channel(strtok_r(NULL, " ", &strptr));
 
     if(chn == NULL) {
         return;
@@ -162,10 +170,9 @@ void set_topic(struct channel** channels, char* nick, char* strptr) {
     send_to_channel(chn, nick, "TOPIC", chn->name, chn->topic);
 }
 
-void who_request(struct channel** channels, struct user* usr, char* chn_name) {
+void who_request(struct user* usr, char* chn_name) {
 
-    struct channel* chn;
-    HASH_FIND_STR(*channels, chn_name, chn);
+    struct channel* chn = get_channel(chn_name);
 
     if(chn == NULL) {
         return;
@@ -187,10 +194,9 @@ void who_request(struct channel** channels, struct user* usr, char* chn_name) {
     sock_send(usr->c_sock, "315", usr->nick, tempbuffer);
 }
 
-void name_reply(struct channel** channels, struct user* usr, char* chn_name) {
+void name_reply(struct user* usr, char* chn_name) {
 
-    struct channel* chn;
-    HASH_FIND_STR(*channels, chn_name, chn);
+    struct channel* chn = get_channel(chn_name);
 
     if(chn == NULL) {
         return;
@@ -218,13 +224,9 @@ void name_reply(struct channel** channels, struct user* usr, char* chn_name) {
     sock_send(usr->c_sock, "366", usr->nick, tempbuffer);
 }
 
-void user_part(struct channel** channels, struct user* usr, char* strptr) {
+void user_part(struct user* usr, char* strptr) {
 
-    char chn_name[50];
-    strcpy(chn_name, strtok_r(NULL, " ", &strptr));
-
-    struct channel* chn;
-    HASH_FIND_STR(*channels, chn_name, chn);
+    struct channel* chn = get_channel(strtok_r(NULL, " ", &strptr));
 
     if(chn == NULL) {
         return;
@@ -246,7 +248,7 @@ void user_part(struct channel** channels, struct user* usr, char* strptr) {
         }
     }
 
-    send_to_channel(chn, usr->nick, "PART", chn_name, strtok_r(NULL, " ", &strptr));
+    send_to_channel(chn, usr->nick, "PART", chn->name, strtok_r(NULL, " ", &strptr));
 }
 
 void user_quit(struct user* usr, char* message) {

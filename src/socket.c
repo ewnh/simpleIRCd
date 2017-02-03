@@ -127,8 +127,13 @@ void sock_send_host(SOCK c_sock, char* hostname, char* command, char* target, ch
     strcat(response, hostname);
     strcat(response, " ");
     strcat(response, command);
-    strcat(response, " ");
-    strcat(response, target);
+
+    //If no target set (e.g. QUIT), don't attach to response
+    if(strcmp(target, "") != 0) {
+        strcat(response, " ");
+        strcat(response, target);
+    }
+
     strcat(response, " ");
     strcat(response, message);
     strcat(response, "\r\n");

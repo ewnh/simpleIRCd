@@ -220,30 +220,30 @@ void name_reply(struct channel** channels, struct user* usr, char* chn_name) {
 
 void user_part(struct channel** channels, struct user* usr, char* strptr) {
 
-	char chn_name[50];
-	strcpy(chn_name, strtok_r(NULL, " ", &strptr));
+    char chn_name[50];
+    strcpy(chn_name, strtok_r(NULL, " ", &strptr));
 
     struct channel* chn;
     HASH_FIND_STR(*channels, chn_name, chn);
 
     if(chn == NULL) {
-		return;
+        return;
     }
 
     for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
-		if(chn->users[i] == NULL && usr->channels[i] == NULL) {
-			break;
-		}
+        if(chn->users[i] == NULL && usr->channels[i] == NULL) {
+            break;
+        }
 
-		//Remove user from channel's users list
-		if(chn->users[i] == usr) {
-			chn->users[i] = NULL;
-		}
+        //Remove user from channel's users list
+        if(chn->users[i] == usr) {
+            chn->users[i] = NULL;
+        }
 
-		//Remove channel from user's channel list
-		if(usr->channels[i] == chn) {
-			usr->channels[i] = NULL;
-		}
+        //Remove channel from user's channel list
+        if(usr->channels[i] == chn) {
+            usr->channels[i] = NULL;
+        }
     }
 
     send_to_channel(chn, usr->nick, "PART", chn_name, strtok_r(NULL, " ", &strptr));
@@ -254,18 +254,18 @@ void user_quit(struct user* usr, char* message) {
     //Loop over every channel the user belongs to
     for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
         if(usr->channels[i] == NULL) {
-            return;
+            break;
         }
 
         //Loop over users in that channel and remove usr
         for(int j = 0; j < CHANNEL_MAX_USERS; j++) {
             if(usr->channels[i]->users[j] == usr) {
                 usr->channels[i]->users[j] == NULL;
-                send_to_channel(usr->channels[i], usr->nick, "QUIT", usr->channels[i]->name, message);
+                send_to_channel(usr->channels[i], usr->nick, "QUIT", "", message);
                 break;
             }
         }
     }
 
-    sock_send(usr->c_sock, "ERROR", "", ":Client quit");
+    sock_send(usr->c_sock, "ERROR", ":Closing Link:", message);
 }

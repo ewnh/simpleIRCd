@@ -6,7 +6,7 @@
 
 extern char server_name; //defined in socket.c
 extern char startup_time;
-extern struct channel* channels;
+extern struct channel* channels; //defined in parser.c
 
 void send_to_channel(struct channel* chn, char* hostname, char* command, char* target, char* message) {
     for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
@@ -23,12 +23,17 @@ void send_to_channel(struct channel* chn, char* hostname, char* command, char* t
     }
 }
 
-struct channel* get_channel(char* chn_name) {
+struct channel* get_channel(struct user* usr, char* chn_name) {
 
     struct channel* chn;
     HASH_FIND_STR(channels, chn_name, chn);
 
     if(chn == NULL) {
+        char error[67]; //Max channel name length (50) + length of text
+        sprintf(error, "%s :No such channel", chn_name);
+
+        sock_send(usr->c_sock, "403", usr->nick, error);
+
         return NULL;
     }
 
@@ -89,18 +94,18 @@ void join_channel(struct user* hc, char* name) {
     name_reply(hc, name);
 }
 
-void send_privmsg(char* sender, char* strptr) {
+void send_privmsg(struct user* usr, char* strptr) {
 
-    char target[50];
-    strcpy(target, strtok_r(NULL, " ", &strptr));
+    char chn_name[50];
+    strcpy(chn_name, strtok_r(NULL, " ", &strptr));
 
-    struct channel* chn = get_channel(target);
+    struct channel* chn = get_channel(usr, chn_name);
 
     if(chn == NULL) {
         return;
     }
 
-    send_to_channel(chn, sender, "PRIVMSG", target, strptr);
+    send_to_channel(chn, usr->nick, "PRIVMSG", chn_name, strptr);
 }
 
 void send_registration_messages(SOCK c_sock, char* nick, char* username) {
@@ -157,9 +162,9 @@ void whois_user(struct user** users, SOCK c_sock, char* sender, char* target) {
     sock_send(c_sock, "318", sender, tempbuffer);
 }
 
-void set_topic(char* nick, char* strptr) {
+void set_topic(struct user* usr, char* strptr) {
 
-    struct channel* chn = get_channel(strtok_r(NULL, " ", &strptr));
+    struct channel* chn = get_channel(usr, strtok_r(NULL, " ", &strptr));
 
     if(chn == NULL) {
         return;
@@ -167,12 +172,12 @@ void set_topic(char* nick, char* strptr) {
 
     strcpy(chn->topic, ++strptr);
 
-    send_to_channel(chn, nick, "TOPIC", chn->name, chn->topic);
+    send_to_channel(chn, usr->nick, "TOPIC", chn->name, chn->topic);
 }
 
 void who_request(struct user* usr, char* chn_name) {
 
-    struct channel* chn = get_channel(chn_name);
+    struct channel* chn = get_channel(usr, chn_name);
 
     if(chn == NULL) {
         return;
@@ -196,7 +201,7 @@ void who_request(struct user* usr, char* chn_name) {
 
 void name_reply(struct user* usr, char* chn_name) {
 
-    struct channel* chn = get_channel(chn_name);
+    struct channel* chn = get_channel(usr, chn_name);
 
     if(chn == NULL) {
         return;
@@ -226,7 +231,7 @@ void name_reply(struct user* usr, char* chn_name) {
 
 void user_part(struct user* usr, char* strptr) {
 
-    struct channel* chn = get_channel(strtok_r(NULL, " ", &strptr));
+    struct channel* chn = get_channel(usr, strtok_r(NULL, " ", &strptr));
 
     if(chn == NULL) {
         return;

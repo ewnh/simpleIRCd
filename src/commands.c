@@ -267,7 +267,7 @@ void user_quit(struct user* usr, char* message) {
         //Loop over users in that channel and remove usr
         for(int j = 0; j < CHANNEL_MAX_USERS; j++) {
             if(usr->channels[i]->users[j] == usr) {
-                usr->channels[i]->users[j] == NULL;
+                usr->channels[i]->users[j] = NULL;
                 send_to_channel(usr->channels[i], usr->nick, "QUIT", "", message);
                 break;
             }

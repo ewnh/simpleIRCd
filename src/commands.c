@@ -195,6 +195,26 @@ void set_nick(struct user** users, struct user* usr, char* nick) {
     HASH_FIND_STR(*users, nick, tempusr);
 
     if(tempusr == NULL) {
+        //If nick previously set
+        if(usr->nick[0] != '\0') {
+            HASH_DEL(*users, usr);
+        }
+
+        //If user isn't in any channels and this is a nick change
+        if(usr->channels[0] == NULL && usr->nick[0] != '\0') {
+            sock_send_host(usr->c_sock, usr->nick, "NICK", "", nick);
+        }
+        //Loop over channels and send a channel message
+        else {
+            for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
+                if(usr->channels[i] == NULL) {
+                    break;
+                }
+
+                send_to_channel(usr->channels[i], usr->nick, "NICK", "", nick);
+            }
+        }
+
         strcpy(usr->nick, nick);
         HASH_ADD_STR(*users, nick, usr);
     }

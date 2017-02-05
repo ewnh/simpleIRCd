@@ -19,6 +19,7 @@ void handle_connection(struct user* hc) {
 
     memset(hc->channels, 0, sizeof(hc->channels));
     hc->is_cap_negotiating = 0;
+    hc->nick[0] = '\0';
 
     char message[513];
     char recvbuffer[513];

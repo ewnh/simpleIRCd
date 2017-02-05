@@ -36,6 +36,7 @@ void handle_connection(struct user* hc) {
 
         char* strptr;
         char* command = strtok_r(message, " ", &strptr);
+        to_upper(command);
 
         if(strcmp(command, "PRIVMSG") == 0) {
             send_privmsg(hc, strptr);

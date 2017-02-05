@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <ctype.h>
 
 #ifdef _WIN32
 #include <winsock2.h>
@@ -70,6 +71,7 @@ SOCK server_setup() {
     }
     #else
     if(err < 0) {
+
         perror("Bind failed");
         exit(EXIT_FAILURE);
     }
@@ -236,4 +238,16 @@ char* strtok_r(char *str, const char *delim, char **nextp) {
 
     *nextp = str;
     return ret;
+}
+
+void to_upper(char* str) {
+
+    //Max length of received command is 512 bytes
+    for(int i = 0; i < 512; i++) {
+        if(str[i] == '\0') {
+            return;
+        }
+
+        str[i] = toupper(str[i]);
+    }
 }

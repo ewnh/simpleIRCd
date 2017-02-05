@@ -101,6 +101,9 @@ void handle_connection(struct user* hc) {
             user_quit(hc, strtok_r(NULL, " ", &strptr));
             break;
         }
+        else if(strcmp(command, "LIST") == 0) {
+            list_channels(hc);
+        }
     }
 
     printf("Connection closed\n");

@@ -13,5 +13,6 @@ void who_request(struct user*, char*);
 void name_reply(struct user*, char*);
 void user_part(struct user*, char*);
 void user_quit(struct user*, char*);
+void list_channels(struct user*);
 
 #endif // COMMANDS_H_INCLUDED

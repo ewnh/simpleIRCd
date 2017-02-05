@@ -347,3 +347,25 @@ void user_quit(struct user* usr, char* message) {
     }
     sock_send(usr->c_sock, "ERROR", ":Closing Link:", message);
 }
+
+int get_users_in_channel(struct channel* chn) {
+
+    for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
+        if(chn->users[i] == NULL) {
+            return i;
+        }
+    }
+}
+
+void list_channels(struct user* usr) {
+
+    struct channel* chn;
+    char tempbuffer[128];
+
+    for(chn = channels; chn != NULL; chn = chn->hh.next) {
+        sprintf(tempbuffer, "%s %i :%s", chn->name, get_users_in_channel(chn), chn->topic);
+        sock_send(usr->c_sock, "322", usr->nick, tempbuffer);
+    }
+
+    sock_send(usr->c_sock, "323", usr->nick, ":End of LIST");
+}

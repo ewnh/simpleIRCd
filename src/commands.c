@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdbool.h>
 
 #include "commands.h"
 #include "socket.h"
@@ -52,6 +53,26 @@ void reorder_user_array(struct user** usrs) {
             }
         }
     }
+}
+
+int get_users_in_channel(struct channel* chn) {
+    for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
+        if(chn->users[i] == NULL) {
+            return i;
+        }
+    }
+}
+
+//Check if a channel needs removing and remove if necessary
+bool check_remove_channel(struct channel* chn) {
+
+    if(get_users_in_channel(chn) == 0) {
+        HASH_DEL(channels, chn);
+        free(chn);
+        return true;
+    }
+
+    return false;
 }
 
 void join_channel(struct user* hc, char* name) {
@@ -304,8 +325,10 @@ void user_part(struct user* usr, char* strptr) {
         }
     }
 
-    //Reorder channel's user array
-    reorder_user_array(chn->users);
+    if(!check_remove_channel(chn)) {
+        //Reorder channel's user array
+        reorder_user_array(chn->users);
+    }
 
     //Reorder user's channel list
     for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
@@ -331,7 +354,11 @@ void user_quit(struct user* usr, char* message) {
         for(int j = 0; j < CHANNEL_MAX_USERS; j++) {
             if(usr->channels[i]->users[j] == usr) {
                 usr->channels[i]->users[j] = NULL;
-                send_to_channel(usr->channels[i], usr->nick, "QUIT", "", message);
+
+                if(!check_remove_channel(usr->channels[i])) {
+                    send_to_channel(usr->channels[i], usr->nick, "QUIT", "", message);
+                }
+
                 break;
             }
         }
@@ -346,15 +373,6 @@ void user_quit(struct user* usr, char* message) {
         reorder_user_array(usr->channels[i]->users);
     }
     sock_send(usr->c_sock, "ERROR", ":Closing Link:", message);
-}
-
-int get_users_in_channel(struct channel* chn) {
-
-    for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
-        if(chn->users[i] == NULL) {
-            return i;
-        }
-    }
 }
 
 void list_channels(struct user* usr) {

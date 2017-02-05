@@ -40,6 +40,20 @@ struct channel* get_channel(struct user* usr, char* chn_name) {
     return chn;
 }
 
+//Rearrange user array so there is a continuous set of elements
+//Used to fill in any null references, ensuring null only occurs at the end of an array
+void reorder_user_array(struct user** usrs) {
+    //Loop over users
+    for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
+        //If user ref is null, move all users down 1 element
+        if(usrs[i] == NULL) {
+            for(int j = i+1; j < CHANNEL_MAX_USERS; j++) {
+                usrs[j-1] = usrs[j];
+            }
+        }
+    }
+}
+
 void join_channel(struct user* hc, char* name) {
 
     if(strlen(name) > 50) {
@@ -253,6 +267,18 @@ void user_part(struct user* usr, char* strptr) {
         }
     }
 
+    //Reorder channel's user array
+    reorder_user_array(chn->users);
+
+    //Reorder user's channel list
+    for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
+        if(usr->channels[i] == NULL) {
+            for(int j = i+1; j < CHANNEL_MAX_USERS; j++) {
+                usr->channels[j-1] = usr->channels[j];
+            }
+        }
+    }
+
     send_to_channel(chn, usr->nick, "PART", chn->name, strtok_r(NULL, " ", &strptr));
 }
 
@@ -274,5 +300,13 @@ void user_quit(struct user* usr, char* message) {
         }
     }
 
+    //Loop over each channel the user is connected to
+    for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
+        if(usr->channels[i] == NULL) {
+            continue;
+        }
+        //Reorder the channel's user array
+        reorder_user_array(usr->channels[i]->users);
+    }
     sock_send(usr->c_sock, "ERROR", ":Closing Link:", message);
 }

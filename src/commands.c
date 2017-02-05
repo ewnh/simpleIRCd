@@ -189,6 +189,23 @@ void set_topic(struct user* usr, char* strptr) {
     send_to_channel(chn, usr->nick, "TOPIC", chn->name, chn->topic);
 }
 
+void set_nick(struct user** users, struct user* usr, char* nick) {
+
+    struct user* tempusr;
+    HASH_FIND_STR(*users, nick, tempusr);
+
+    if(tempusr == NULL) {
+        strcpy(usr->nick, nick);
+        HASH_ADD_STR(*users, nick, usr);
+    }
+
+    else {
+        char error[50];
+        sprintf(error, "%s :Nickname is already in use", nick);
+        sock_send(usr->c_sock, "433", "*", error);
+    }
+}
+
 void who_request(struct user* usr, char* chn_name) {
 
     struct channel* chn = get_channel(usr, chn_name);

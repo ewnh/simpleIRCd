@@ -55,9 +55,7 @@ void handle_connection(struct user* hc) {
             }
         }
         else if(strcmp(command, "NICK") == 0) {
-            char* nick = strtok_r(NULL, " ", &strptr);
-            strcpy(hc->nick, nick);
-            HASH_ADD_STR(users, nick, hc);
+            set_nick(&users, hc, strtok_r(NULL, " ", &strptr));
         }
         else if(strcmp(command, "USER") == 0) {
             strcpy(hc->username, strtok_r(NULL, " ", &strptr));

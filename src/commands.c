@@ -143,9 +143,9 @@ void send_privmsg(struct user* usr, char* strptr) {
     send_to_channel(chn, usr->nick, "PRIVMSG", chn_name, strptr);
 }
 
-void send_registration_messages(SOCK c_sock, char* nick, char* username) {
+void send_registration_messages(SOCK c_sock, char* nick, char* username, char* address) {
     char tempbuffer[128];
-    sprintf(tempbuffer, "Welcome to the Internet Relay Network %s!%s", nick, username);
+    sprintf(tempbuffer, "Welcome to the Internet Relay Network %s!%s@%s", nick, username, address);
     sock_send(c_sock, "001", nick, tempbuffer);
     sprintf(tempbuffer, "Your host is %s, running simpleIRCd", &server_name);
     sock_send(c_sock, "002", nick, tempbuffer);
@@ -173,7 +173,7 @@ void whois_user(struct user** users, SOCK c_sock, char* sender, char* target) {
     char tempbuffer[128];
 
     //Send RPL_WHOISUSER: <nick> <user> <host> * :<real name>
-    sprintf(tempbuffer, "%s %s %s * :%s", usr->nick, usr->username, "TESTHOST", usr->realname);
+    sprintf(tempbuffer, "%s %s %s * :%s", usr->nick, usr->username, usr->address, usr->realname);
     sock_send(c_sock, "311", sender, tempbuffer);
 
     //Send RPL_WHOISSERVER: <nick> <server> :<server info>
@@ -262,7 +262,7 @@ void who_request(struct user* usr, char* chn_name) {
             break;
         }
 
-        sprintf(tempbuffer, "%s %s %s %s %s G :%s %s", chn->name, chn->users[i]->username, "TESTHOST", &server_name,
+        sprintf(tempbuffer, "%s %s %s %s %s G :%s %s", chn->name, chn->users[i]->username, chn->users[i]->address, &server_name,
                 chn->users[i]->nick, "0", chn->users[i]->realname);
         sock_send(usr->c_sock, "352", usr->nick, tempbuffer);
     }

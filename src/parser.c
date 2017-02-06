@@ -53,7 +53,7 @@ void handle_connection(struct user* hc) {
                 sock_send(hc->c_sock, "CAP", "*", "LS :");
             }
             else if(strcmp(command, "END") == 0 && hc->is_cap_negotiating == 1) {
-                send_registration_messages(hc->c_sock, hc->nick, hc->username);
+                send_registration_messages(hc->c_sock, hc->nick, hc->username, hc->address);
             }
         }
         else if(strcmp(command, "NICK") == 0) {
@@ -77,7 +77,7 @@ void handle_connection(struct user* hc) {
 
             //If client doesn't want to do IRCv3 capacity negotiation
             if(hc->is_cap_negotiating == 0) {
-                send_registration_messages(hc->c_sock, hc->nick, hc->username);
+                send_registration_messages(hc->c_sock, hc->nick, hc->username, hc->address);
             }
         }
         else if(strcmp(command, "JOIN") == 0) {

@@ -8,6 +8,7 @@
 
 struct user {
     SOCK c_sock;
+    char address[16];
     int is_cap_negotiating;
     char nick[10];
     char username[20];

@@ -89,29 +89,29 @@ void server_shutdown() {
     #endif
 }
 
-SOCK sock_accept(SOCK sock) {
+void sock_accept(SOCK sock, SOCK* c_sock, char* address) {
     struct sockaddr_in client;
 
     listen(sock, 1);
     printf("Waiting\n");
 
     int c = sizeof(struct sockaddr_in);
-    SOCK c_sock = accept(sock, (struct sockaddr *)&client, &c);
+    *c_sock = accept(sock, (struct sockaddr *)&client, &c);
 
     #ifdef _WIN32
-    if (c_sock == INVALID_SOCKET) {
+    if (*c_sock == INVALID_SOCKET) {
         printf("Accept failed: %d\n", ERROR);
         exit(EXIT_FAILURE);
     }
     #else
-    if(c_sock < 0) {
+    if(*c_sock < 0) {
         perror("Accept failed");
         exit(EXIT_FAILURE);
     }
     #endif
-    printf("Connection accepted\n");
 
-    return c_sock;
+    strcpy(address, inet_ntoa(client.sin_addr));
+    printf("Connection accepted from %s\n", address);
 }
 
 void sock_send_host(SOCK c_sock, char* hostname, char* command, char* target, char* message) {

@@ -11,7 +11,7 @@ int main()
 
     while(1) {
         struct user* usr = malloc(sizeof(struct user));
-        usr->c_sock = sock_accept(sock);
+        sock_accept(sock, &(usr->c_sock), usr->address);
         start_handle_thread(usr);
     }
     server_shutdown();

@@ -309,6 +309,8 @@ void user_part(struct user* usr, char* strptr) {
         return;
     }
 
+    send_to_channel(chn, usr->nick, "PART", chn->name, strtok_r(NULL, " ", &strptr));
+
     for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
         if(chn->users[i] == NULL && usr->channels[i] == NULL) {
             break;
@@ -338,8 +340,6 @@ void user_part(struct user* usr, char* strptr) {
             }
         }
     }
-
-    send_to_channel(chn, usr->nick, "PART", chn->name, strtok_r(NULL, " ", &strptr));
 }
 
 void user_quit(struct user* usr, char* message) {

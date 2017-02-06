@@ -71,7 +71,6 @@ SOCK server_setup() {
     }
     #else
     if(err < 0) {
-
         perror("Bind failed");
         exit(EXIT_FAILURE);
     }

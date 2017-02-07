@@ -82,10 +82,23 @@ bool get_flag(char* modes, char flag) {
     }
 }
 
-void set_flag(char* modes, char flag) {
-    for(int i = 0; i < CHANNEL_MAX_FLAGS; i++) {
-        if(modes[i] == '\0') {
-            modes[i] = flag;
+void set_flag(char* modes, char* flag) {
+    //If adding a flag
+    if(flag[0] == '+') {
+        for(int i = 0; i < CHANNEL_MAX_FLAGS; i++) {
+            if(modes[i] == '\0') {
+                modes[i] = flag[1];
+                return;
+            }
+        }
+    }
+    //Otherwise, remove it
+    else {
+        for(int i = 0; i < CHANNEL_MAX_FLAGS; i++) {
+            if(modes[i] == flag[1]) {
+                modes[i] = '\0';
+                return;
+            }
         }
     }
 }

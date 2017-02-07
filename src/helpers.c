@@ -70,3 +70,14 @@ bool check_remove_channel(struct channel* chn) {
 
     return false;
 }
+
+bool get_flag(char* modes, char flag) {
+    for(int i = 0; i < 10; i++) {
+        if(modes[i] == '\0') {
+            return false;
+        }
+        if(modes[i] == flag) {
+            return true;
+        }
+    }
+}

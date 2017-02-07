@@ -81,7 +81,7 @@ void handle_connection(struct user* hc) {
             }
         }
         else if(strcmp(command, "JOIN") == 0) {
-            join_channel(hc, strtok_r(NULL, " ", &strptr));
+            join_channel(hc, strptr);
         }
         else if(strcmp(command, "WHOIS") == 0) {
             whois_user(&users, hc->c_sock, hc->nick, strtok_r(NULL, " ", &strptr));

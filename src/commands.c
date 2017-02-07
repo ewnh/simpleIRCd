@@ -11,7 +11,10 @@ extern char server_name; //defined in socket.c
 extern char startup_time;
 extern struct channel* channels; //defined in parser.c
 
-void join_channel(struct user* hc, char* name) {
+void join_channel(struct user* hc, char* strptr) {
+
+    char name[64];
+    strcpy(name, strtok_r(NULL, " ", &strptr));
 
     if(strlen(name) > 50) {
         printf("Channel name too long\n");
@@ -38,6 +41,8 @@ void join_channel(struct user* hc, char* name) {
 
         chn->limit = CHANNEL_MAX_USERS;
 
+        memset(chn->password, '\0', sizeof(chn->password));
+
         HASH_ADD_STR(channels, name, chn);
         }
 
@@ -47,6 +52,13 @@ void join_channel(struct user* hc, char* name) {
             char tempbuffer[64];
             sprintf(tempbuffer, "%s :Cannot join channel (+l)", chn->name);
             sock_send(hc->c_sock, "471", hc->nick, tempbuffer);
+            return;
+        }
+
+        if(get_flag(chn->mode, 'k') && strcmp(chn->password, strtok_r(NULL, " ", &strptr)) != 0) {
+            char tempbuffer[64];
+            sprintf(tempbuffer, "%s :Cannot join channel (+k)", chn->name);
+            sock_send(hc->c_sock, "475", hc->nick, tempbuffer);
             return;
         }
         //Add user point to channel's users array
@@ -361,7 +373,6 @@ void channel_mode(struct user* usr, char* strptr) {
         //Switch on flag character
         switch(flag[1]) {
         //Toggle flags
-        case 'a':
         case 'm':
         case 'n':
         case 'p':
@@ -370,7 +381,24 @@ void channel_mode(struct user* usr, char* strptr) {
             break;
         case 'o':
         case 'v':
+        //Channel key (password)
         case 'k':
+            //Remove password
+            if(flag[0] == '-') {
+                chn->password[0] = '\0';
+            }
+            else {
+                strcpy(args, strtok_r(NULL, " ", &strptr));
+
+                //No argument provided
+                if(args[0] == '\0') {
+                    return;
+                }
+
+                strcpy(chn->password, args);
+                set_flag(chn->mode, "+k");
+            }
+            break;
         //Channel limit
         case 'l':
             //Remove limit
@@ -395,6 +423,7 @@ void channel_mode(struct user* usr, char* strptr) {
                 }
 
                 chn->limit = atoi(args);
+                set_flag(chn->mode, "+l");
             }
             break;
         case 'b':

@@ -1,0 +1,10 @@
+#ifndef HELPERS_H_INCLUDED
+#define HELPERS_H_INCLUDED
+
+void send_to_channel(struct channel*, char*, char*, char*, char*);
+struct channel* get_channel(struct user*, char*);
+void reorder_user_array(struct user**);
+int get_users_in_channel(struct channel*);
+bool check_remove_channel(struct channel*);
+
+#endif // HELPERS_H_INCLUDED

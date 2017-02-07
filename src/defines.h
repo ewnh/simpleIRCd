@@ -21,6 +21,7 @@ struct user {
 struct channel {
     char name[50];
     char topic[50];
+    char mode[10];
     struct user* users[CHANNEL_MAX_USERS];
     UT_hash_handle hh;
 };

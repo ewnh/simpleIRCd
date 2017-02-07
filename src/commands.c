@@ -387,3 +387,14 @@ void list_channels(struct user* usr) {
 
     sock_send(usr->c_sock, "323", usr->nick, ":End of LIST");
 }
+
+void channel_mode(struct user* usr, char* chn_name) {
+
+    struct channel* chn = get_channel(usr, chn_name);
+
+    if(chn == NULL) {
+        return;
+    }
+
+    sock_send(usr->c_sock, "MODE", chn_name, chn->mode);
+}

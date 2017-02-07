@@ -105,6 +105,11 @@ void handle_connection(struct user* hc) {
         else if(strcmp(command, "LIST") == 0) {
             list_channels(hc);
         }
+        else if(strcmp(command, "MODE") == 0) {
+            if(*strptr == '#') {
+                channel_mode(hc, strtok_r(NULL, " ", &strptr));
+            }
+        }
         else {
             //Reuse message buffer - it's erased every loop iteration anyway
             sprintf(message, "%s :Unknown command", command);

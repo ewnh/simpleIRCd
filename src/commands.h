@@ -14,5 +14,6 @@ void name_reply(struct user*, char*);
 void user_part(struct user*, char*);
 void user_quit(struct user*, char*);
 void list_channels(struct user*);
+void channel_mode(struct user*, char*);
 
 #endif // COMMANDS_H_INCLUDED

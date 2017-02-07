@@ -328,13 +328,37 @@ void list_channels(struct user* usr) {
     sock_send(usr->c_sock, "323", usr->nick, ":End of LIST");
 }
 
-void channel_mode(struct user* usr, char* chn_name) {
+void channel_mode(struct user* usr, char* strptr) {
 
-    struct channel* chn = get_channel(usr, chn_name);
+    struct channel* chn = get_channel(usr, strtok_r(NULL, " ", &strptr));
 
     if(chn == NULL) {
         return;
     }
 
-    sock_send(usr->c_sock, "MODE", chn_name, chn->mode);
+    //If no argument provided, send current modes
+    if(strptr[0] == '\0') {
+        sock_send(usr->c_sock, "MODE", chn->name, chn->mode);
+    }
+    else {
+        char* flag = strtok_r(NULL, " ", &strptr);
+
+        //Switch on flag character
+        switch(flag[1]) {
+        //Toggle flags
+        case 'a':
+        case 'm':
+        case 'n':
+        case 'p':
+        case 't':
+            set_flag(chn->mode, flag);
+            break;
+        case 'o':
+        case 'v':
+        case 'k':
+        case 'l':
+        case 'b':
+        case 'I':
+        }
+    }
 }

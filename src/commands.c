@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <ctype.h>
 
 #include "defines.h"
 #include "helpers.h"
@@ -35,7 +36,7 @@ void join_channel(struct user* hc, char* name) {
         chn->mode[0] = '+';
         chn->mode[1] = 'n';
 
-        chn->limit = 10;
+        chn->limit = CHANNEL_MAX_USERS;
 
         HASH_ADD_STR(channels, name, chn);
         }
@@ -352,7 +353,9 @@ void channel_mode(struct user* usr, char* strptr) {
     }
     else {
         char flag[8];
+        memset(flag, '\0', sizeof(flag));
         char args[8];
+        memset(args, '\0', sizeof(args));
         strcpy(flag, strtok_r(NULL, " ", &strptr));
 
         //Switch on flag character
@@ -370,8 +373,29 @@ void channel_mode(struct user* usr, char* strptr) {
         case 'k':
         //Channel limit
         case 'l':
-            strcpy(args, strtok_r(NULL, " ", &strptr));
-            chn->limit = atoi(args);
+            //Remove limit
+            if(flag[0] == '-') {
+                chn->limit = CHANNEL_MAX_USERS;
+            }
+            //Otherwise, change limit
+            else {
+                strcpy(args, strtok_r(NULL, " ", &strptr));
+
+                //Check if args is an int
+                for(int i = 0; i < 8; i++) {
+
+                    //If null encountered and an argument (length > 0) is present
+                    if(args[i] == '\0' && i > 0) {
+                        break;
+                    }
+
+                    if(!isdigit(args[i])) {
+                        return;
+                    }
+                }
+
+                chn->limit = atoi(args);
+            }
             break;
         case 'b':
         case 'I':

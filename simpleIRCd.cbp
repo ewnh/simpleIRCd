@@ -49,6 +49,10 @@
 		</Unit>
 		<Unit filename="src/commands.h" />
 		<Unit filename="src/defines.h" />
+		<Unit filename="src/helpers.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/helpers.h" />
 		<Unit filename="src/main.c">
 			<Option compilerVar="CC" />
 		</Unit>

@@ -31,6 +31,9 @@ void join_channel(struct user* hc, char* name) {
         chn->users[0] = hc;
 
         memset(chn->mode, '\0', sizeof(chn->mode));
+        //Default modes
+        chn->mode[0] = '+';
+        chn->mode[1] = 'n';
 
         HASH_ADD_STR(channels, name, chn);
         }

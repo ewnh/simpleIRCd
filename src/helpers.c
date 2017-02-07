@@ -72,7 +72,7 @@ bool check_remove_channel(struct channel* chn) {
 }
 
 bool get_flag(char* modes, char flag) {
-    for(int i = 0; i < 10; i++) {
+    for(int i = 0; i < CHANNEL_MAX_FLAGS; i++) {
         if(modes[i] == '\0') {
             return false;
         }
@@ -83,7 +83,7 @@ bool get_flag(char* modes, char flag) {
 }
 
 void set_flag(char* modes, char flag) {
-    for(int i = 0; i < 10; i++) {
+    for(int i = 0; i < CHANNEL_MAX_FLAGS; i++) {
         if(modes[i] == '\0') {
             modes[i] = flag;
         }

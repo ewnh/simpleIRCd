@@ -5,6 +5,7 @@
 #include "socket.h"
 
 #define CHANNEL_MAX_USERS 100
+#define CHANNEL_MAX_FLAGS 10
 
 struct user {
     SOCK c_sock;
@@ -21,7 +22,7 @@ struct user {
 struct channel {
     char name[50];
     char topic[50];
-    char mode[10];
+    char mode[CHANNEL_MAX_FLAGS];
     struct user* users[CHANNEL_MAX_USERS];
     UT_hash_handle hh;
 };

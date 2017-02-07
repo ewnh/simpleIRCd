@@ -351,7 +351,9 @@ void channel_mode(struct user* usr, char* strptr) {
         sock_send(usr->c_sock, "MODE", chn->name, chn->mode);
     }
     else {
-        char* flag = strtok_r(NULL, " ", &strptr);
+        char flag[8];
+        char args[8];
+        strcpy(flag, strtok_r(NULL, " ", &strptr));
 
         //Switch on flag character
         switch(flag[1]) {
@@ -368,12 +370,19 @@ void channel_mode(struct user* usr, char* strptr) {
         case 'k':
         //Channel limit
         case 'l':
-            chn->limit = atoi(strtok_r(NULL, " ", &strptr));
+            strcpy(args, strtok_r(NULL, " ", &strptr));
+            chn->limit = atoi(args);
             break;
         case 'b':
         case 'I':
         default:
             break;
         }
+
+        //Add arguments for sending
+        strcat(flag, " ");
+        strcat(flag, args);
+
+        send_to_channel(chn, usr->nick, "MODE", chn->name, flag);
     }
 }

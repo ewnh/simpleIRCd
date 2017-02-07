@@ -24,6 +24,7 @@ struct channel {
     char topic[50];
     char mode[CHANNEL_MAX_FLAGS];
     struct user* users[CHANNEL_MAX_USERS];
+    int limit;
     UT_hash_handle hh;
 };
 

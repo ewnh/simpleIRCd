@@ -35,10 +35,20 @@ void join_channel(struct user* hc, char* name) {
         chn->mode[0] = '+';
         chn->mode[1] = 'n';
 
+        chn->limit = 10;
+
         HASH_ADD_STR(channels, name, chn);
         }
 
     else {
+        //If channel limit reached
+        if(chn->limit == get_users_in_channel(chn)) {
+            char tempbuffer[64];
+            sprintf(tempbuffer, "%s :Cannot join channel (+l)", chn->name);
+            sock_send(hc->c_sock, "471", hc->nick, tempbuffer);
+            return;
+        }
+        //Add user point to channel's users array
         for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
             if(chn->users[i] == NULL) {
                 chn->users[i] = hc;
@@ -356,9 +366,14 @@ void channel_mode(struct user* usr, char* strptr) {
         case 'o':
         case 'v':
         case 'k':
+        //Channel limit
         case 'l':
+            chn->limit = atoi(strtok_r(NULL, " ", &strptr));
+            break;
         case 'b':
         case 'I':
+        default:
+            break;
         }
     }
 }

@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <ctype.h>
 #include <stdbool.h>
 
 #include "defines.h"
@@ -127,6 +128,35 @@ bool set_oper(struct channel* chn, char* flag, char* args) {
             chn->operators[i] = op;
             return true;
         }
+    }
+    return false;
+}
+
+bool set_user_limit(struct channel* chn, char* args, char* flag) {
+    //Remove limit
+    if(flag[0] == '-' && get_flag(chn->mode, 'l')) {
+        chn->limit = CHANNEL_MAX_USERS;
+        set_flag(chn->mode, "-l");
+        return true;
+    }
+    //Otherwise, change limit
+    else {
+        //Check if args is an int
+        for(int i = 0; i < 8; i++) {
+
+            //If null encountered and an argument (length > 0) is present
+            if(args[i] == '\0' && i > 0) {
+                break;
+            }
+
+            if(!isdigit(args[i])) {
+                return false;
+            }
+        }
+
+        chn->limit = atoi(args);
+        set_flag(chn->mode, "+l");
+        return true;
     }
     return false;
 }

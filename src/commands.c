@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdbool.h>
-#include <ctype.h>
 
 #include "defines.h"
 #include "helpers.h"
@@ -415,30 +414,9 @@ void channel_mode(struct user* usr, char* strptr) {
             break;
         //Channel limit
         case 'l':
-            //Remove limit
-            if(flag[0] == '-' && get_flag(chn->mode, 'l')) {
-                chn->limit = CHANNEL_MAX_USERS;
-                set_flag(chn->mode, "-l");
-            }
-            //Otherwise, change limit
-            else {
-                strcpy(args, strtok_r(NULL, " ", &strptr));
-
-                //Check if args is an int
-                for(int i = 0; i < 8; i++) {
-
-                    //If null encountered and an argument (length > 0) is present
-                    if(args[i] == '\0' && i > 0) {
-                        break;
-                    }
-
-                    if(!isdigit(args[i])) {
-                        return;
-                    }
-                }
-
-                chn->limit = atoi(args);
-                set_flag(chn->mode, "+l");
+            strcpy(args, strtok_r(NULL, " ", &strptr));
+            if(!set_user_limit(chn, args, flag)) {
+                return;
             }
             break;
         case 'b':

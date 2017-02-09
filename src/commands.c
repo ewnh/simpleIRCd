@@ -384,8 +384,9 @@ void channel_mode(struct user* usr, char* strptr) {
         //Channel key (password)
         case 'k':
             //Remove password
-            if(flag[0] == '-') {
+            if(flag[0] == '-' && get_flag(chn->mode, 'k')) {
                 chn->password[0] = '\0';
+                set_flag(chn->mode, "-k");
             }
             else {
                 strcpy(args, strtok_r(NULL, " ", &strptr));
@@ -402,8 +403,9 @@ void channel_mode(struct user* usr, char* strptr) {
         //Channel limit
         case 'l':
             //Remove limit
-            if(flag[0] == '-') {
+            if(flag[0] == '-' && get_flag(chn->mode, 'l')) {
                 chn->limit = CHANNEL_MAX_USERS;
+                set_flag(chn->mode, "-l");
             }
             //Otherwise, change limit
             else {

@@ -34,6 +34,8 @@ void join_channel(struct user* hc, char* strptr) {
         memset(chn->users, 0, sizeof(chn->users));
         chn->users[0] = hc;
 
+        memset(chn->operators, 0, sizeof(chn->operators));
+
         memset(chn->mode, '\0', sizeof(chn->mode));
         //Default modes
         chn->mode[0] = '+';
@@ -379,6 +381,7 @@ void channel_mode(struct user* usr, char* strptr) {
         case 't':
             set_flag(chn->mode, flag);
             break;
+        //Make specified user an operator for this channel
         case 'o':
         case 'v':
         //Channel key (password)

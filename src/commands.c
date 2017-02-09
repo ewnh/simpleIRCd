@@ -44,6 +44,8 @@ void join_channel(struct user* hc, char* strptr) {
 
         memset(chn->password, '\0', sizeof(chn->password));
 
+        memset(chn->bans, '\0', sizeof(chn->bans));
+
         HASH_ADD_STR(channels, name, chn);
         }
 
@@ -406,7 +408,8 @@ void channel_mode(struct user* usr, char* strptr) {
             }
             break;
         case 'b':
-        case 'I':
+            strcat(chn->bans, args);
+            strcat(chn->bans, " ");
         default:
             break;
         }

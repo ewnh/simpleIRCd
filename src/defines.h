@@ -25,6 +25,7 @@ struct channel {
     char mode[CHANNEL_MAX_FLAGS];
     struct user* users[CHANNEL_MAX_USERS];
     struct user* operators[CHANNEL_MAX_USERS];
+    char bans[256];
     char password[10];
     int limit;
     UT_hash_handle hh;

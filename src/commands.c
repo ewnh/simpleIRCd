@@ -82,6 +82,9 @@ void join_channel(struct user* hc, char* strptr) {
 
     send_to_channel(chn, hc->nick, "JOIN", name, "");
 
+    //Mode message
+    sock_send(hc->c_sock, "MODE", chn->name, chn->mode);
+
     //If channel topic set
     if(chn->topic[0] != '\0') {
         char tempbuffer[128];
@@ -361,14 +364,16 @@ void channel_mode(struct user* usr, char* strptr) {
         return;
     }
 
+    char flag[64];
     //If no argument provided, send current modes
     if(strptr[0] == '\0') {
-        sock_send(usr->c_sock, "MODE", chn->name, chn->mode);
+        //Reuse flag array
+        sprintf(flag, "%s %s", chn->name, chn->mode);
+        sock_send(usr->c_sock, "324", usr->nick, flag);
     }
     else {
-        char flag[64];
-        memset(flag, '\0', sizeof(flag));
         char args[64];
+        memset(flag, '\0', sizeof(flag));
         memset(args, '\0', sizeof(args));
         strcpy(flag, strtok_r(NULL, " ", &strptr));
 

@@ -115,10 +115,11 @@ bool set_oper(struct channel* chn, char* flag, char* args) {
     if(flag[0] == '-') {
         for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
             if(chn->operators[i] == op) {
-                chn->operators[i] = false;
+                chn->operators[i] = NULL;
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     for(int i = 0; i < CHANNEL_MAX_USERS; i++) {

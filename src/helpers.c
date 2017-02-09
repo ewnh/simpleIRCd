@@ -4,6 +4,7 @@
 #include "defines.h"
 
 extern struct channel* channels;
+extern struct user* users;
 
 void send_to_channel(struct channel* chn, char* hostname, char* command, char* target, char* message) {
     for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
@@ -101,4 +102,19 @@ void set_flag(char* modes, char* flag) {
             }
         }
     }
+}
+
+bool set_oper(struct channel* chn, char* args) {
+    struct user* op;
+    HASH_FIND_STR(users, args, op);
+
+    if(op != NULL) {
+        for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
+            if(chn->operators[i] == NULL) {
+                chn->operators[i] = op;
+                return true;
+            }
+        }
+    }
+    return false;
 }

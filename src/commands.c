@@ -366,9 +366,9 @@ void channel_mode(struct user* usr, char* strptr) {
         sock_send(usr->c_sock, "MODE", chn->name, chn->mode);
     }
     else {
-        char flag[8];
+        char flag[64];
         memset(flag, '\0', sizeof(flag));
-        char args[8];
+        char args[64];
         memset(args, '\0', sizeof(args));
         strcpy(flag, strtok_r(NULL, " ", &strptr));
 
@@ -383,6 +383,11 @@ void channel_mode(struct user* usr, char* strptr) {
             break;
         //Make specified user an operator for this channel
         case 'o':
+            strcpy(args, strtok_r(NULL, " ", &strptr));
+            if(!set_oper(chn, args)) {
+                return;
+            }
+            break;
         case 'v':
         //Channel key (password)
         case 'k':

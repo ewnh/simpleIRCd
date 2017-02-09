@@ -8,6 +8,6 @@ int get_users_in_channel(struct channel*);
 bool check_remove_channel(struct channel*);
 bool get_flag(char*, char);
 void set_flag(char*, char*);
-bool set_oper(struct channel*, char*);
+bool set_oper(struct channel*, char*, char*);
 
 #endif // HELPERS_H_INCLUDED

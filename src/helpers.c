@@ -104,16 +104,27 @@ void set_flag(char* modes, char* flag) {
     }
 }
 
-bool set_oper(struct channel* chn, char* args) {
+bool set_oper(struct channel* chn, char* flag, char* args) {
     struct user* op;
     HASH_FIND_STR(users, args, op);
 
-    if(op != NULL) {
+    if(op == NULL) {
+        return false;
+    }
+
+    if(flag[0] == '-') {
         for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
-            if(chn->operators[i] == NULL) {
-                chn->operators[i] = op;
-                return true;
+            if(chn->operators[i] == op) {
+                chn->operators[i] = false;
             }
+        }
+        return true;
+    }
+
+    for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
+        if(chn->operators[i] == NULL) {
+            chn->operators[i] = op;
+            return true;
         }
     }
     return false;

@@ -384,7 +384,7 @@ void channel_mode(struct user* usr, char* strptr) {
         //Make specified user an operator for this channel
         case 'o':
             strcpy(args, strtok_r(NULL, " ", &strptr));
-            if(!set_oper(chn, args)) {
+            if(!set_oper(chn, flag, args)) {
                 return;
             }
             break;

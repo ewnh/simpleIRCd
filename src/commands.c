@@ -375,6 +375,7 @@ void channel_mode(struct user* usr, char* strptr) {
         memset(flag, '\0', sizeof(flag));
         memset(args, '\0', sizeof(args));
         strcpy(flag, strtok_r(NULL, " ", &strptr));
+        strcpy(args, strtok_r(NULL, " ", &strptr));
 
         //Switch on flag character
         switch(flag[1]) {
@@ -387,7 +388,6 @@ void channel_mode(struct user* usr, char* strptr) {
             break;
         //Make specified user an operator for this channel
         case 'o':
-            strcpy(args, strtok_r(NULL, " ", &strptr));
             if(!set_oper(chn, flag, args)) {
                 return;
             }
@@ -395,27 +395,13 @@ void channel_mode(struct user* usr, char* strptr) {
         case 'v':
         //Channel key (password)
         case 'k':
-            //Remove password
-            if(flag[0] == '-' && get_flag(chn->mode, 'k')) {
-                chn->password[0] = '\0';
-                set_flag(chn->mode, "-k");
-            }
-            else {
-                strcpy(args, strtok_r(NULL, " ", &strptr));
-
-                //No argument provided
-                if(args[0] == '\0') {
-                    return;
-                }
-
-                strcpy(chn->password, args);
-                set_flag(chn->mode, "+k");
+            if(!set_channel_pass(chn, flag, args)) {
+                return;
             }
             break;
-        //Channel limit
+        //Channel user limit
         case 'l':
-            strcpy(args, strtok_r(NULL, " ", &strptr));
-            if(!set_user_limit(chn, args, flag)) {
+            if(!set_user_limit(chn, flag, args)) {
                 return;
             }
             break;

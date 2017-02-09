@@ -10,5 +10,6 @@ bool get_flag(char*, char);
 void set_flag(char*, char*);
 bool set_oper(struct channel*, char*, char*);
 bool set_user_limit(struct channel*, char*, char*);
+bool set_channel_pass(struct channel*, char*, char*);
 
 #endif // HELPERS_H_INCLUDED

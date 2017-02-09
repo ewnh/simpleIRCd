@@ -132,7 +132,7 @@ bool set_oper(struct channel* chn, char* flag, char* args) {
     return false;
 }
 
-bool set_user_limit(struct channel* chn, char* args, char* flag) {
+bool set_user_limit(struct channel* chn, char* flag, char* args) {
     //Remove limit
     if(flag[0] == '-' && get_flag(chn->mode, 'l')) {
         chn->limit = CHANNEL_MAX_USERS;
@@ -159,4 +159,23 @@ bool set_user_limit(struct channel* chn, char* args, char* flag) {
         return true;
     }
     return false;
+}
+
+bool set_channel_pass(struct channel* chn, char* flag, char* args) {
+    //Remove password
+    if(flag[0] == '-' && get_flag(chn->mode, 'k')) {
+        chn->password[0] = '\0';
+        set_flag(chn->mode, "-k");
+        return true;
+    }
+    else {
+        //No argument provided
+        if(args[0] == '\0') {
+            return false;
+        }
+
+        strcpy(chn->password, args);
+        set_flag(chn->mode, "+k");
+    }
+    return true;
 }

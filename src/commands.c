@@ -414,16 +414,16 @@ void channel_mode(struct user* usr, char* strptr) {
                 char* argptr;
                 char* ban = strtok_r(args, " ", &argptr);
                 for(int i = 0; i < 256; i++) {
-                    if(ban == '\0') {
+                    if(ban[0] == '\0') {
                         break;
                     }
                     sprintf(flag, "%s %s", chn->name, ban);
                     sock_send(usr->c_sock, "367", usr->nick, flag);
-                    ban = strtok_r(NULL, " ", &strptr);
+                    ban = strtok_r(NULL, " ", &argptr);
                 }
                 sprintf(flag, "%s :End of channel ban list", chn->name);
                 sock_send(usr->c_sock, "368", usr->nick, flag);
-
+                return;
             }
             strcat(chn->bans, args);
             strcat(chn->bans, " ");

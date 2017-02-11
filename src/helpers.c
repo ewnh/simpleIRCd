@@ -179,3 +179,30 @@ bool set_channel_pass(struct channel* chn, char* flag, char* args) {
     }
     return true;
 }
+
+//Returns true if mode message should be sent to channel
+bool set_ban(struct channel* chn, struct user* usr, char* flag, char* args) {
+    //If no args, display list of bans
+    if(args[0] == '\0') {
+        char* banptr;
+        char* ban = strtok_r(chn->bans, " ", &banptr);
+
+        for(int i = 0; i < 256; i++) {
+            if(ban[0] == '\0') {
+                break;
+            }
+
+            sprintf(flag, "%s %s", chn->name, ban);
+            sock_send(usr->c_sock, "367", usr->nick, flag);
+            ban = strtok_r(NULL, " ", &banptr);
+        }
+
+        sprintf(flag, "%s :End of channel ban list", chn->name);
+        sock_send(usr->c_sock, "368", usr->nick, flag);
+        return false;
+    }
+
+    strcat(chn->bans, args);
+    strcat(chn->bans, " ");
+    return true;
+}

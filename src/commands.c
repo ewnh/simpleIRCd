@@ -408,10 +408,12 @@ void channel_mode(struct user* usr, char* strptr) {
             }
             break;
         case 'b':
-            if(set_ban(chn, usr, flag, args)) {
-                break;
+            if(args[0] == '\0') {
+                display_bans(chn, usr);
+                return;
             }
-            return;
+            set_ban(chn, args);
+            break;
         default:
             break;
         }

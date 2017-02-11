@@ -11,6 +11,7 @@ void set_flag(char*, char*);
 bool set_oper(struct channel*, char*, char*);
 bool set_user_limit(struct channel*, char*, char*);
 bool set_channel_pass(struct channel*, char*, char*);
-bool set_ban(struct channel*, struct user*, char*, char*);
+void set_ban(struct channel*, char*);
+void display_bans(struct channel*, struct user*);
 
 #endif // HELPERS_H_INCLUDED

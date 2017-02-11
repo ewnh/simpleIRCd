@@ -181,7 +181,28 @@ bool set_channel_pass(struct channel* chn, char* flag, char* args) {
 }
 
 //Returns true if mode message should be sent to channel
-void set_ban(struct channel* chn, char* args) {
+void set_ban(struct channel* chn, char* flag, char* args) {
+    //Remove ban
+    if(flag[0] == '-') {
+        char* banptr;
+        char* ban = strtok_r(chn->bans, " ", &banptr);
+
+        for(int i = 0; i < 256; i++) {
+            if(ban[0] == '\0') {
+                return;
+            }
+
+            if(strcmp(ban, args) == 0) {
+                for(int j = 0; j < strlen(ban); j++) {
+                    *ban = '\0';
+                    ban++;
+                }
+            }
+
+            ban = strtok_r(NULL, " ", &banptr);
+        }
+    }
+
     strcat(chn->bans, args);
     strcat(chn->bans, " ");
 }

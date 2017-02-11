@@ -412,7 +412,7 @@ void channel_mode(struct user* usr, char* strptr) {
                 display_bans(chn, usr);
                 return;
             }
-            set_ban(chn, args);
+            set_ban(chn, flag, args);
             break;
         default:
             break;

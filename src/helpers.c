@@ -193,9 +193,24 @@ void set_ban(struct channel* chn, char* flag, char* args) {
             }
 
             if(strcmp(ban, args) == 0) {
-                for(int j = 0; j < strlen(ban); j++) {
+                int len = strlen(ban);
+                for(int j = 0; j < len; j++) {
                     *ban = '\0';
                     ban++;
+                }
+                *ban = ' ';
+
+                int nullcount = 0;
+                for(int j = 0; j < 256; j++) {
+                    if(chn->bans[j] == '\0') {
+                        nullcount += 1;
+                    }
+                    else {
+                        for(int k = j; k < 256; k++) {
+                            chn->bans[k-nullcount] = chn->bans[k];
+                        }
+                        nullcount = 0;
+                    }
                 }
             }
 

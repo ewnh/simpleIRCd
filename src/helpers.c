@@ -208,9 +208,13 @@ void set_ban(struct channel* chn, char* flag, char* args) {
 }
 
 void display_bans(struct channel* chn, struct user* usr) {
+    char banlist[256];
+    //Copy original ban array as strtok_r is destructive
+    strcpy(banlist, chn->bans);
+
     char message[64];
     char* banptr;
-    char* ban = strtok_r(chn->bans, " ", &banptr);
+    char* ban = strtok_r(banlist, " ", &banptr);
 
     for(int i = 0; i < 256; i++) {
         if(ban[0] == '\0') {

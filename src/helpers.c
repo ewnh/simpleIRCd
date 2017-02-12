@@ -192,6 +192,7 @@ void set_ban(struct channel* chn, char* flag, char* args) {
                 return;
             }
 
+            //TODO: this only kinda works
             if(strcmp(ban, args) == 0) {
                 int len = strlen(ban);
                 for(int j = 0; j < len; j++) {

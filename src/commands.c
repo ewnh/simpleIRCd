@@ -12,21 +12,21 @@ extern struct channel* channels; //defined in parser.c
 
 void join_channel(struct user* hc, char* strptr) {
 
-    char name[64];
-    strcpy(name, strtok_r(NULL, " ", &strptr));
+    char buffer[64];
+    strcpy(buffer, strtok_r(NULL, " ", &strptr));
 
-    if(strlen(name) > 50) {
+    if(strlen(buffer) > 50) {
         printf("Channel name too long\n");
         return;
     }
 
     struct channel* chn;
-    HASH_FIND_STR(channels, name, chn);
+    HASH_FIND_STR(channels, buffer, chn);
 
     if(chn == NULL) { //channel doesn't already exist
         chn = malloc(sizeof(struct channel));
 
-        strcpy(chn->name, name);
+        strcpy(chn->name, buffer);
 
         chn->topic[0] = '\0';
 
@@ -52,16 +52,14 @@ void join_channel(struct user* hc, char* strptr) {
     else {
         //If channel limit reached
         if(chn->limit == get_users_in_channel(chn)) {
-            char tempbuffer[64];
-            sprintf(tempbuffer, "%s :Cannot join channel (+l)", chn->name);
-            sock_send(hc->c_sock, "471", hc->nick, tempbuffer);
+            sprintf(buffer, "%s :Cannot join channel (+l)", chn->name);
+            sock_send(hc->c_sock, "471", hc->nick, buffer);
             return;
         }
 
         if(get_flag(chn->mode, 'k') && strcmp(chn->password, strtok_r(NULL, " ", &strptr)) != 0) {
-            char tempbuffer[64];
-            sprintf(tempbuffer, "%s :Cannot join channel (+k)", chn->name);
-            sock_send(hc->c_sock, "475", hc->nick, tempbuffer);
+            sprintf(buffer, "%s :Cannot join channel (+k)", chn->name);
+            sock_send(hc->c_sock, "475", hc->nick, buffer);
             return;
         }
         //Add user point to channel's users array
@@ -72,7 +70,6 @@ void join_channel(struct user* hc, char* strptr) {
             }
         }
     }
-    printf("Joined channel %s\n", name);
 
     for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
         if(hc->channels[i] == NULL) {
@@ -81,21 +78,20 @@ void join_channel(struct user* hc, char* strptr) {
         }
     }
 
-    send_to_channel(chn, hc->nick, "JOIN", name, "");
+    send_to_channel(chn, hc->nick, "JOIN", chn->name, "");
 
     //Mode message
     sock_send(hc->c_sock, "MODE", chn->name, chn->mode);
 
     //If channel topic set
     if(chn->topic[0] != '\0') {
-        char tempbuffer[128];
-        sprintf(tempbuffer, "%s :%s", name, chn->topic);
-        sock_send(hc->c_sock, "332", hc->nick, tempbuffer);
+        sprintf(buffer, "%s :%s", chn->name, chn->topic);
+        sock_send(hc->c_sock, "332", hc->nick, buffer);
     }
     //Don't send a message if no topic set
 
     //Send names message
-    name_reply(hc, name);
+    name_reply(hc, chn->name);
 }
 
 void send_privmsg(struct user* usr, char* strptr) {

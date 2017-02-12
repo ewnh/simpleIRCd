@@ -56,10 +56,15 @@ void join_channel(struct user* hc, char* strptr) {
             sock_send(hc->c_sock, "471", hc->nick, buffer);
             return;
         }
-
+        //Password check
         if(get_flag(chn->mode, 'k') && strcmp(chn->password, strtok_r(NULL, " ", &strptr)) != 0) {
             sprintf(buffer, "%s :Cannot join channel (+k)", chn->name);
             sock_send(hc->c_sock, "475", hc->nick, buffer);
+            return;
+        }
+        if(check_if_banned(chn, hc)) {
+            sprintf(buffer, "%s :Cannot join channel (+b)", chn->name);
+            sock_send(hc->c_sock, "474", hc->nick, buffer);
             return;
         }
         //Add user point to channel's users array

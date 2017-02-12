@@ -245,3 +245,25 @@ void display_bans(struct channel* chn, struct user* usr) {
     sprintf(message, "%s :End of channel ban list", chn->name);
     sock_send(usr->c_sock, "368", usr->nick, message);
 }
+
+bool check_if_banned(struct channel* chn, struct user* usr) {
+    char banlist[256];
+    strcpy(banlist, chn->bans);
+
+    char* banptr;
+    char* ban = strtok_r(banlist, " ", &banptr);
+
+    for(int i = 0; i < 256; i++) {
+        if(ban[0] == '\0') {
+            return false;
+        }
+        //Check if nick banned
+        if(strcmp(ban, usr->nick) == 0) {
+            return true;
+        }
+        //Check if IP banned
+        if(strcmp(ban, usr->address) == 0) {
+            return true;
+        }
+    }
+}

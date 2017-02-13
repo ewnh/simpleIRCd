@@ -105,6 +105,19 @@ void set_flag(char* modes, char* flag) {
     }
 }
 
+bool is_oper(struct channel* chn, struct user* usr) {
+
+    for(int i = 0; i < 256; i++) {
+        if(chn->operators[i] == NULL) {
+            return false;
+        }
+        if(chn->operators[i] == usr) {
+            return true;
+        }
+    }
+    return false;
+}
+
 bool set_oper(struct channel* chn, char* flag, char* args) {
     struct user* op;
     HASH_FIND_STR(users, args, op);

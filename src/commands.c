@@ -34,6 +34,7 @@ void join_channel(struct user* hc, char* strptr) {
         chn->users[0] = hc;
 
         memset(chn->operators, 0, sizeof(chn->operators));
+        chn->operators[0] = hc;
 
         memset(chn->mode, '\0', sizeof(chn->mode));
         //Default modes
@@ -62,12 +63,13 @@ void join_channel(struct user* hc, char* strptr) {
             sock_send(hc->c_sock, "475", hc->nick, buffer);
             return;
         }
+        //If banned
         if(check_if_banned(chn, hc)) {
             sprintf(buffer, "%s :Cannot join channel (+b)", chn->name);
             sock_send(hc->c_sock, "474", hc->nick, buffer);
             return;
         }
-        //Add user point to channel's users array
+        //Add user pointer to channel's users array
         for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
             if(chn->users[i] == NULL) {
                 chn->users[i] = hc;

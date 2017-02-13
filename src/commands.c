@@ -376,11 +376,23 @@ void channel_mode(struct user* usr, char* strptr) {
         sock_send(usr->c_sock, "324", usr->nick, flag);
     }
     else {
-        char args[64];
         memset(flag, '\0', sizeof(flag));
-        memset(args, '\0', sizeof(args));
         strcpy(flag, strtok_r(NULL, " ", &strptr));
+
+        char args[64];
+        memset(args, '\0', sizeof(args));
         strcpy(args, strtok_r(NULL, " ", &strptr));
+
+        //Check if user wants to display bans
+        if(strcmp(flag, "+b") == 0 && args[0] == '\0') {
+            display_bans(chn, usr);
+            return;
+        }
+
+        //All other mode actions require op privileges
+        if(!is_oper(chn, usr)) {
+            return;
+        }
 
         //Switch on flag character
         switch(flag[1]) {
@@ -411,10 +423,6 @@ void channel_mode(struct user* usr, char* strptr) {
             }
             break;
         case 'b':
-            if(args[0] == '\0') {
-                display_bans(chn, usr);
-                return;
-            }
             set_ban(chn, flag, args);
             break;
         default:

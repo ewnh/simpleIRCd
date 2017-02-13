@@ -266,6 +266,18 @@ bool check_if_banned(struct channel* chn, struct user* usr) {
             return true;
         }
 
+        char* ptr;
+        //Check nick from mask
+        if(strcmp(strtok_r(ban, "!", &ptr), usr->nick) == 0) {
+            return true;
+        }
+        //Ignore text before @
+        strtok_r(NULL, "@", &ptr);
+        //Check address from mask
+        if(strcmp(strtok_r(NULL, "@", &ptr), usr->address) == 0) {
+            return true;
+        }
+
         ban = strtok_r(NULL, " ", &banptr);
     }
 }

@@ -159,6 +159,9 @@ void whois_user(struct user** users, SOCK c_sock, char* sender, char* target) {
             break;
         }
 
+        if(is_oper(usr->channels[i], usr)) {
+            strcat(tempbuffer, "@");
+        }
         strcat(tempbuffer, usr->channels[i]->name);
         strcat(tempbuffer, " ");
     }
@@ -228,14 +231,18 @@ void who_request(struct user* usr, char* chn_name) {
     }
 
     char tempbuffer[128];
-
     for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
         if(chn->users[i] == NULL) {
             break;
         }
 
-        sprintf(tempbuffer, "%s %s %s %s %s G :%s %s", chn->name, chn->users[i]->username, chn->users[i]->address, &server_name,
-                chn->users[i]->nick, "0", chn->users[i]->realname);
+        char op_status[3] = {'H', '\0', '\0'};
+        if(is_oper(chn, chn->users[i])) {
+            op_status[1] = '@';
+        }
+
+        sprintf(tempbuffer, "%s %s %s %s %s %s :%s %s", chn->name, chn->users[i]->username, chn->users[i]->address, &server_name,
+                op_status, chn->users[i]->nick, "0", chn->users[i]->realname);
         sock_send(usr->c_sock, "352", usr->nick, tempbuffer);
     }
 
@@ -261,6 +268,9 @@ void name_reply(struct user* usr, char* chn_name) {
             break;
         }
 
+        if(is_oper(chn, chn->users[i])) {
+            strcat(tempbuffer, "@");
+        }
         strcat(tempbuffer, chn->users[i]->nick);
         strcat(tempbuffer, " ");
     }

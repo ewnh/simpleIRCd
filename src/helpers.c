@@ -265,5 +265,7 @@ bool check_if_banned(struct channel* chn, struct user* usr) {
         if(strcmp(ban, usr->address) == 0) {
             return true;
         }
+
+        ban = strtok_r(NULL, " ", &banptr);
     }
 }

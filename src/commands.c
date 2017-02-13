@@ -416,7 +416,9 @@ void channel_mode(struct user* usr, char* strptr) {
             set_ban(chn, flag, args);
             break;
         default:
-            break;
+            sprintf(flag, "%s :is unknown mode char to me for %s", flag, chn->name);
+            sock_send(usr->c_sock, "472", usr->nick, flag);
+            return;
         }
 
         //Add arguments for sending

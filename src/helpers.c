@@ -106,15 +106,18 @@ void set_flag(char* modes, char* flag) {
 }
 
 bool is_oper(struct channel* chn, struct user* usr) {
-
     for(int i = 0; i < 256; i++) {
         if(chn->operators[i] == NULL) {
-            return false;
+            break;
         }
         if(chn->operators[i] == usr) {
             return true;
         }
     }
+
+    char buffer[64];
+    sprintf(buffer, "%s :You're not a channel operator", chn->name);
+    sock_send(usr->c_sock, "482", usr->nick, buffer);
     return false;
 }
 

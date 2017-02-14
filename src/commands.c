@@ -105,16 +105,23 @@ void join_channel(struct user* hc, char* strptr) {
 
 void send_privmsg(struct user* usr, char* strptr) {
 
-    char chn_name[50];
-    strcpy(chn_name, strtok_r(NULL, " ", &strptr));
+    char tempbuffer[64];
+    strcpy(tempbuffer, strtok_r(NULL, " ", &strptr));
 
-    struct channel* chn = get_channel(usr, chn_name);
+    struct channel* chn = get_channel(usr, tempbuffer);
 
     if(chn == NULL) {
         return;
     }
 
-    send_to_channel(chn, usr->nick, "PRIVMSG", chn_name, strptr);
+    if(get_flag(chn->mode, 'm') && !(is_present(chn->operators, usr)
+                                    || is_present(chn->voiced, usr))) {
+        sprintf(tempbuffer, "%s :Cannot send to channel", chn->name);
+        sock_send(usr->c_sock, "404", usr->nick, tempbuffer);
+        return;
+    }
+
+    send_to_channel(chn, usr->nick, "PRIVMSG", chn->name, strptr);
 }
 
 void send_registration_messages(SOCK c_sock, char* nick, char* username, char* address) {

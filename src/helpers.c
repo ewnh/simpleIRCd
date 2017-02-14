@@ -114,10 +114,6 @@ bool is_oper(struct channel* chn, struct user* usr) {
             return true;
         }
     }
-
-    char buffer[64];
-    sprintf(buffer, "%s :You're not a channel operator", chn->name);
-    sock_send(usr->c_sock, "482", usr->nick, buffer);
     return false;
 }
 

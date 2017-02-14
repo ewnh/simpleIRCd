@@ -401,6 +401,8 @@ void channel_mode(struct user* usr, char* strptr) {
 
         //All other mode actions require op privileges
         if(!is_oper(chn, usr)) {
+            sprintf(flag, "%s :You're not a channel operator", chn->name);
+            sock_send(usr->c_sock, "482", usr->nick, flag);
             return;
         }
 

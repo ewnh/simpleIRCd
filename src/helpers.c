@@ -118,7 +118,7 @@ bool is_present(struct user** userlist, struct user* usr) {
     }
 }
 
-bool set_oper(struct channel* chn, char* flag, char* args) {
+bool set_status(struct user** array, char* flag, char* args) {
     struct user* op;
     HASH_FIND_STR(users, args, op);
 
@@ -128,8 +128,8 @@ bool set_oper(struct channel* chn, char* flag, char* args) {
 
     if(flag[0] == '-') {
         for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
-            if(chn->operators[i] == op) {
-                chn->operators[i] = NULL;
+            if(array[i] == op) {
+                array[i] = NULL;
                 return true;
             }
         }
@@ -137,8 +137,8 @@ bool set_oper(struct channel* chn, char* flag, char* args) {
     }
 
     for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
-        if(chn->operators[i] == NULL) {
-            chn->operators[i] = op;
+        if(array[i] == NULL) {
+            array[i] = op;
             return true;
         }
     }

@@ -417,7 +417,7 @@ void channel_mode(struct user* usr, char* strptr) {
             break;
         //Make specified user an operator for this channel
         case 'o':
-            if(!set_oper(chn, flag, args)) {
+            if(!set_status(chn->operators, flag, args)) {
                 return;
             }
             break;

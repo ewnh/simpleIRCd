@@ -8,7 +8,7 @@ int get_users_in_channel(struct channel*);
 bool check_remove_channel(struct channel*);
 bool get_flag(char*, char);
 void set_flag(char*, char*);
-bool is_oper(struct channel*, struct user*);
+bool is_present(struct user**, struct user*);
 bool set_oper(struct channel*, char*, char*);
 bool set_user_limit(struct channel*, char*, char*);
 bool set_channel_pass(struct channel*, char*, char*);

@@ -105,16 +105,17 @@ void set_flag(char* modes, char* flag) {
     }
 }
 
-bool is_oper(struct channel* chn, struct user* usr) {
+//Searches given user array for given user
+//Used to check if user is chanop or voiced
+bool is_present(struct user** userlist, struct user* usr) {
     for(int i = 0; i < 256; i++) {
-        if(chn->operators[i] == NULL) {
-            break;
+        if(userlist[i] == NULL) {
+            return false;
         }
-        if(chn->operators[i] == usr) {
+        if(userlist[i] == usr) {
             return true;
         }
     }
-    return false;
 }
 
 bool set_oper(struct channel* chn, char* flag, char* args) {

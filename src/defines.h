@@ -24,6 +24,7 @@ struct channel {
     char topic[50];
     char mode[CHANNEL_MAX_FLAGS];
     struct user* users[CHANNEL_MAX_USERS];
+    struct user* voiced[CHANNEL_MAX_USERS];
     struct user* operators[CHANNEL_MAX_USERS];
     char bans[256];
     char password[10];

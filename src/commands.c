@@ -36,6 +36,8 @@ void join_channel(struct user* hc, char* strptr) {
         memset(chn->operators, 0, sizeof(chn->operators));
         chn->operators[0] = hc;
 
+        memset(chn->voiced, 0, sizeof(chn->voiced));
+
         memset(chn->mode, '\0', sizeof(chn->mode));
         //Default modes
         chn->mode[0] = '+';
@@ -421,7 +423,12 @@ void channel_mode(struct user* usr, char* strptr) {
                 return;
             }
             break;
+        //Add/remove voice privileges
         case 'v':
+            if(!set_status(chn->voiced, flag, args)) {
+                return;
+            }
+            break;
         //Channel key (password)
         case 'k':
             if(!set_channel_pass(chn, flag, args)) {

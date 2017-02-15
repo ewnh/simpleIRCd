@@ -131,13 +131,14 @@ void send_registration_messages(SOCK c_sock, char* nick, char* username, char* a
     sock_send(c_sock, "002", nick, tempbuffer);
     sprintf(tempbuffer, "This server was started %s", &startup_time);
     sock_send(c_sock, "003", nick, tempbuffer);
-    sprintf(tempbuffer, "%s simpleIRCd TODO", &server_name);
+    sprintf(tempbuffer, "%s simpleIRCd mnptovklb", &server_name);
     sock_send(c_sock, "004", nick, tempbuffer);
 
     //MOTD
     sprintf(tempbuffer, ":- %s Message of the day - ", &server_name);
     sock_send(c_sock, "375", nick, tempbuffer);
-    sock_send(c_sock, "372", nick, ":- MOTD goes here");
+    sock_send(c_sock, "372", nick, ":- Running simpleIRCd");
+    sock_send(c_sock, "372", nick, ":- https://github.com/ewnh/simpleIRCd");
     sock_send(c_sock, "376", nick, ":End of MOTD command");
 }
 

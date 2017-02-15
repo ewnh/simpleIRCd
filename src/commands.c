@@ -396,7 +396,7 @@ void list_channels(struct user* usr) {
     sock_send(usr->c_sock, "323", usr->nick, ":End of LIST");
 }
 
-void channel_mode(struct user* usr, char* strptr) {
+void set_mode(struct user* usr, char* strptr) {
 
     struct channel* chn = get_channel(usr, strtok_r(NULL, " ", &strptr));
 
@@ -480,5 +480,53 @@ void channel_mode(struct user* usr, char* strptr) {
         strcat(flag, args);
 
         send_to_channel(chn, usr->nick, "MODE", chn->name, flag);
+    }
+}
+
+void kick_user(struct user** users, struct user* usr, char* strptr) {
+
+    struct channel* chn = get_channel(usr, strtok_r(NULL, " ", &strptr));
+
+    char tempbuffer[64];
+    strcpy(tempbuffer, strtok_r(NULL, " ", &strptr));
+
+    struct user* kicked;
+    HASH_FIND_STR(*users, tempbuffer, kicked);
+
+    if(chn == NULL || kicked == NULL) {
+        return;
+    }
+
+    sprintf(tempbuffer, "%s %s", kicked->nick, strtok_r(NULL, " ", &strptr));
+    send_to_channel(chn, usr->nick, "KICK", chn->name, tempbuffer);
+
+    for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
+        if(chn->users[i] == NULL && usr->channels[i] == NULL) {
+            break;
+        }
+
+        //Remove user from channel's users list
+        if(chn->users[i] == kicked) {
+            chn->users[i] = NULL;
+        }
+
+        //Remove channel from user's channel list
+        if(kicked->channels[i] == chn) {
+            kicked->channels[i] = NULL;
+        }
+    }
+
+    if(!check_remove_channel(chn)) {
+        //Reorder channel's user array
+        reorder_user_array(chn->users);
+    }
+
+    //Reorder user's channel list
+    for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
+        if(kicked->channels[i] == NULL) {
+            for(int j = i+1; j < CHANNEL_MAX_USERS; j++) {
+                kicked->channels[j-1] = kicked->channels[j];
+            }
+        }
     }
 }

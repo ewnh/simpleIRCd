@@ -62,14 +62,8 @@ void handle_connection(struct user* hc) {
         else if(strcmp(command, "USER") == 0) {
             strcpy(hc->username, strtok_r(NULL, " ", &strptr));
 
-            memset(hc->modes, '\0', 7);
-            //If strtok_r doesn't return an int, or returns 0, ignore
-            if(atoi(strtok_r(NULL, " ", &strptr)) == 8) {
-                //Set user as invisible
-                hc->modes[0] = 'i';
-            }
-
-            //Ignore next parameter; not used
+            //Ignore next two parameters; not used
+            strtok_r(NULL, " ", &strptr);
             strtok_r(NULL, " ", &strptr);
 
             char* realnm = strtok_r(NULL, " ", &strptr);
@@ -106,9 +100,10 @@ void handle_connection(struct user* hc) {
             list_channels(hc);
         }
         else if(strcmp(command, "MODE") == 0) {
-            if(*strptr == '#') {
-                channel_mode(hc, strptr);
-            }
+            set_mode(hc, strptr);
+        }
+        else if(strcmp(command, "KICK") == 0) {
+            kick_user(&users, hc, strptr);
         }
         else {
             //Reuse message buffer - it's erased every loop iteration anyway

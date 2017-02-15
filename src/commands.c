@@ -168,7 +168,7 @@ void whois_user(struct user** users, SOCK c_sock, char* sender, char* target) {
             break;
         }
 
-        if(is_present(usr->channels[i]->users, usr)) {
+        if(is_present(usr->channels[i]->operators, usr)) {
             strcat(tempbuffer, "@");
         }
         strcat(tempbuffer, usr->channels[i]->name);
@@ -246,7 +246,7 @@ void who_request(struct user* usr, char* chn_name) {
         }
 
         char op_status[3] = {'H', '\0', '\0'};
-        if(is_present(chn->users, chn->users[i])) {
+        if(is_present(chn->operators, chn->users[i])) {
             op_status[1] = '@';
         }
 
@@ -277,7 +277,7 @@ void name_reply(struct user* usr, char* chn_name) {
             break;
         }
 
-        if(is_present(chn->users, chn->users[i])) {
+        if(is_present(chn->operators, chn->users[i])) {
             strcat(tempbuffer, "@");
         }
         strcat(tempbuffer, chn->users[i]->nick);

@@ -189,6 +189,13 @@ void set_topic(struct user* usr, char* strptr) {
         return;
     }
 
+    if(get_flag(chn->mode, 't') && !is_present(chn->operators, usr)) {
+        char tempbuffer[64];
+        sprintf(tempbuffer, "%s :You're not a channel operator", chn->name);
+        sock_send(usr->c_sock, "482", usr->nick, tempbuffer);
+        return;
+    }
+
     strcpy(chn->topic, ++strptr);
 
     send_to_channel(chn, usr->nick, "TOPIC", chn->name, chn->topic);

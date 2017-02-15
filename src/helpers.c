@@ -4,9 +4,6 @@
 
 #include "defines.h"
 
-extern struct channel* channels;
-extern struct user* users;
-
 void send_to_channel(struct channel* chn, char* hostname, char* command, char* target, char* message) {
     for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
         if(chn->users[i] == NULL) {

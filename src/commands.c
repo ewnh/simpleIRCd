@@ -6,10 +6,6 @@
 #include "commands.h"
 #include "socket.h"
 
-extern char server_name; //defined in socket.c
-extern char startup_time;
-extern struct channel* channels; //defined in parser.c
-
 void join_channel(struct user* hc, char* strptr) {
 
     char buffer[64];
@@ -145,10 +141,10 @@ void send_registration_messages(SOCK c_sock, char* nick, char* username, char* a
     sock_send(c_sock, "376", nick, ":End of MOTD command");
 }
 
-void whois_user(struct user** users, SOCK c_sock, char* sender, char* target) {
+void whois_user(SOCK c_sock, char* sender, char* target) {
 
     struct user* usr;
-    HASH_FIND_STR(*users, target, usr);
+    HASH_FIND_STR(users, target, usr);
 
     if(usr == NULL) {
         return;
@@ -208,15 +204,15 @@ void set_topic(struct user* usr, char* strptr) {
     send_to_channel(chn, usr->nick, "TOPIC", chn->name, chn->topic);
 }
 
-void set_nick(struct user** users, struct user* usr, char* nick) {
+void set_nick(struct user* usr, char* nick) {
 
     struct user* tempusr;
-    HASH_FIND_STR(*users, nick, tempusr);
+    HASH_FIND_STR(users, nick, tempusr);
 
     if(tempusr == NULL) {
         //If nick previously set
         if(usr->nick[0] != '\0') {
-            HASH_DEL(*users, usr);
+            HASH_DEL(users, usr);
         }
 
         //If user isn't in any channels and this is a nick change
@@ -235,7 +231,7 @@ void set_nick(struct user** users, struct user* usr, char* nick) {
         }
 
         strcpy(usr->nick, nick);
-        HASH_ADD_STR(*users, nick, usr);
+        HASH_ADD_STR(users, nick, usr);
     }
 
     else {
@@ -483,7 +479,7 @@ void set_mode(struct user* usr, char* strptr) {
     }
 }
 
-void kick_user(struct user** users, struct user* usr, char* strptr) {
+void kick_user(struct user* usr, char* strptr) {
 
     struct channel* chn = get_channel(usr, strtok_r(NULL, " ", &strptr));
 
@@ -491,7 +487,7 @@ void kick_user(struct user** users, struct user* usr, char* strptr) {
     strcpy(tempbuffer, strtok_r(NULL, " ", &strptr));
 
     struct user* kicked;
-    HASH_FIND_STR(*users, tempbuffer, kicked);
+    HASH_FIND_STR(users, tempbuffer, kicked);
 
     if(chn == NULL || kicked == NULL) {
         return;

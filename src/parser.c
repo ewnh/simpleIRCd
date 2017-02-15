@@ -11,15 +11,14 @@
 #include "commands.h"
 #include "defines.h"
 
-extern char server_name;
 struct channel* channels = NULL;
 struct user* users = NULL;
 
-void handle_connection(struct user* hc) {
+void handle_connection(struct user* usr) {
 
-    memset(hc->channels, 0, sizeof(hc->channels));
-    hc->is_cap_negotiating = 0;
-    hc->nick[0] = '\0';
+    memset(usr->channels, 0, sizeof(usr->channels));
+    usr->is_cap_negotiating = 0;
+    usr->nick[0] = '\0';
 
     char message[513];
     char recvbuffer[513];
@@ -28,93 +27,93 @@ void handle_connection(struct user* hc) {
 
     while(1) {
         memset(message, 0, 513);
-        int recvstat = sock_recv(hc->c_sock, message, recvbuffer, &buffptr);
+        int recvstat = sock_recv(usr->c_sock, message, recvbuffer, &buffptr);
         if(recvstat == 1) {
             break;
         }
-        printf("%i: %s\n", hc->c_sock, message);
+        printf("%i: %s\n", usr->c_sock, message);
 
         char* strptr;
         char* command = strtok_r(message, " ", &strptr);
         to_upper(command);
 
         if(strcmp(command, "PRIVMSG") == 0) {
-            send_privmsg(hc, strptr);
+            send_privmsg(usr, strptr);
         }
         else if(strcmp(command, "PING") == 0) {
-            sock_send(hc->c_sock, "PONG", &server_name, strtok_r(NULL, " ", &strptr));
+            sock_send(usr->c_sock, "PONG", &server_name, strtok_r(NULL, " ", &strptr));
         }
         else if(strcmp(command, "CAP") == 0) {
             command = strtok_r(NULL, " ", &strptr);
 
             if(strcmp(command, "LS") == 0) {
-                hc->is_cap_negotiating = 1;
+                usr->is_cap_negotiating = 1;
                 //We don't support any IRCv3 capabilities, so send an empty parameter
-                sock_send(hc->c_sock, "CAP", "*", "LS :");
+                sock_send(usr->c_sock, "CAP", "*", "LS :");
             }
-            else if(strcmp(command, "END") == 0 && hc->is_cap_negotiating == 1) {
-                send_registration_messages(hc->c_sock, hc->nick, hc->username, hc->address);
+            else if(strcmp(command, "END") == 0 && usr->is_cap_negotiating == 1) {
+                send_registration_messages(usr->c_sock, usr->nick, usr->username, usr->address);
             }
         }
         else if(strcmp(command, "NICK") == 0) {
-            set_nick(&users, hc, strtok_r(NULL, " ", &strptr));
+            set_nick(usr, strtok_r(NULL, " ", &strptr));
         }
         else if(strcmp(command, "USER") == 0) {
-            strcpy(hc->username, strtok_r(NULL, " ", &strptr));
+            strcpy(usr->username, strtok_r(NULL, " ", &strptr));
 
             //Ignore next two parameters; not used
             strtok_r(NULL, " ", &strptr);
             strtok_r(NULL, " ", &strptr);
 
             char* realnm = strtok_r(NULL, " ", &strptr);
-            strcpy(hc->realname, ++realnm);
+            strcpy(usr->realname, ++realnm);
 
             //If client doesn't want to do IRCv3 capacity negotiation
-            if(hc->is_cap_negotiating == 0) {
-                send_registration_messages(hc->c_sock, hc->nick, hc->username, hc->address);
+            if(usr->is_cap_negotiating == 0) {
+                send_registration_messages(usr->c_sock, usr->nick, usr->username, usr->address);
             }
         }
         else if(strcmp(command, "JOIN") == 0) {
-            join_channel(hc, strptr);
+            join_channel(usr, strptr);
         }
         else if(strcmp(command, "WHOIS") == 0) {
-            whois_user(&users, hc->c_sock, hc->nick, strtok_r(NULL, " ", &strptr));
+            whois_user(usr->c_sock, usr->nick, strtok_r(NULL, " ", &strptr));
         }
         else if(strcmp(command, "TOPIC") == 0) {
-            set_topic(hc, strptr);
+            set_topic(usr, strptr);
         }
         else if(strcmp(command, "WHO") == 0) {
-            who_request(hc, strtok_r(NULL, " ", &strptr));
+            who_request(usr, strtok_r(NULL, " ", &strptr));
         }
         else if(strcmp(command, "NAMES") == 0) {
-            name_reply(hc, strtok_r(NULL, " ", &strptr));
+            name_reply(usr, strtok_r(NULL, " ", &strptr));
         }
         else if(strcmp(command, "PART") == 0) {
-            user_part(hc, strptr);
+            user_part(usr, strptr);
         }
         else if(strcmp(command, "QUIT") == 0) {
-            user_quit(hc, strtok_r(NULL, " ", &strptr));
+            user_quit(usr, strtok_r(NULL, " ", &strptr));
             break;
         }
         else if(strcmp(command, "LIST") == 0) {
-            list_channels(hc);
+            list_channels(usr);
         }
         else if(strcmp(command, "MODE") == 0) {
-            set_mode(hc, strptr);
+            set_mode(usr, strptr);
         }
         else if(strcmp(command, "KICK") == 0) {
-            kick_user(&users, hc, strptr);
+            kick_user(usr, strptr);
         }
         else {
             //Reuse message buffer - it's erased every loop iteration anyway
             sprintf(message, "%s :Unknown command", command);
-            sock_send(hc->c_sock, "421", hc->nick, message);
+            sock_send(usr->c_sock, "421", usr->nick, message);
         }
     }
 
     printf("Connection closed\n");
-    sock_close(hc->c_sock);
-    free(hc);
+    sock_close(usr->c_sock);
+    free(usr);
     return;
 }
 

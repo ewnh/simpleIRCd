@@ -171,6 +171,10 @@ void whois_user(struct user** users, SOCK c_sock, char* sender, char* target) {
             break;
         }
 
+        if(get_flag(usr->channels[i]->mode, 'p')) {
+            continue;
+        }
+
         if(is_present(usr->channels[i]->operators, usr)) {
             strcat(tempbuffer, "@");
         }
@@ -382,6 +386,9 @@ void list_channels(struct user* usr) {
     char tempbuffer[128];
 
     for(chn = channels; chn != NULL; chn = chn->hh.next) {
+        if(get_flag(chn->mode, 'p')) {
+            continue;
+        }
         sprintf(tempbuffer, "%s %i :%s", chn->name, get_users_in_channel(chn), chn->topic);
         sock_send(usr->c_sock, "322", usr->nick, tempbuffer);
     }
@@ -428,10 +435,10 @@ void channel_mode(struct user* usr, char* strptr) {
         //Switch on flag character
         switch(flag[1]) {
         //Toggle flags
-        case 'm':
-        case 'n':
-        case 'p':
-        case 't':
+        case 'm': //Moderated - only allow chanops/voiced users to speak
+        case 'n': //Only allow users in channel to send privmsgs
+        case 'p': //Hide channel from queries e.g. list
+        case 't': //Only let chanops change topic
             set_flag(chn->mode, flag);
             break;
         //Make specified user an operator for this channel
@@ -458,6 +465,7 @@ void channel_mode(struct user* usr, char* strptr) {
                 return;
             }
             break;
+        //Bans
         case 'b':
             set_ban(chn, flag, args);
             break;

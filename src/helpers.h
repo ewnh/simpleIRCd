@@ -1,6 +1,11 @@
 #ifndef HELPERS_H_INCLUDED
 #define HELPERS_H_INCLUDED
 
+#include <stdbool.h>
+#include "defines.h"
+
+char* strtok_r(char *, const char *, char **);
+void to_upper(char*);
 void send_to_channel(struct channel*, char*, char*, char*, char*);
 struct channel* get_channel(struct user*, char*);
 void reorder_user_array(struct user**);

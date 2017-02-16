@@ -7,8 +7,8 @@
 #define CHANNEL_MAX_USERS 100
 #define CHANNEL_MAX_FLAGS 10
 
-extern char server_name; //defined in socket.c
-extern char startup_time;
+extern char server_name[]; //defined in socket.c
+extern char startup_time[];
 
 extern struct channel* channels; //defined in parser.c
 extern struct user* users;

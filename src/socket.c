@@ -17,6 +17,7 @@
 #endif
 
 #include "socket.h"
+#include "helpers.h"
 
 char server_name[256];
 char startup_time[256];
@@ -36,7 +37,6 @@ SOCK server_setup() {
         printf("Failed to initialise WinSock: %d\n", WSAGetLastError());
         exit(EXIT_FAILURE);
     }
-    printf("Initialised Winsock\n");
     #endif
 
     gethostname(server_name, sizeof(server_name));
@@ -58,11 +58,9 @@ SOCK server_setup() {
     }
     #endif
 
-    printf("Socket Created\n");
-
     server.sin_family = AF_INET;
     server.sin_addr.s_addr = INADDR_ANY;
-    server.sin_port = htons(10000);
+    server.sin_port = htons(6667);
 
     int err = bind(sock, (struct sockaddr *)&server, sizeof(server));
     #ifdef _WIN32
@@ -77,7 +75,7 @@ SOCK server_setup() {
     }
     #endif
 
-    printf("Bind complete\n");
+    printf("Server setup complete\n");
 
     set_time();
 
@@ -93,8 +91,8 @@ void server_shutdown() {
 void sock_accept(SOCK sock, SOCK* c_sock, char* address) {
     struct sockaddr_in client;
 
-    listen(sock, 1);
-    printf("Waiting\n");
+    listen(sock, 10);
+    printf("Waiting for connections\n");
 
     int c = sizeof(struct sockaddr_in);
     *c_sock = accept(sock, (struct sockaddr *)&client, &c);
@@ -200,54 +198,4 @@ void sock_close(SOCK c_sock) {
     #else
     close(c_sock);
     #endif
-}
-
-/*
- * public domain strtok_r() by Charlie Gordon
- *
- *   from comp.lang.c  9/14/2007
- *
- *      http://groups.google.com/group/comp.lang.c/msg/2ab1ecbb86646684
- *
- *     (Declaration that it's public domain):
- *      http://groups.google.com/group/comp.lang.c/msg/7c7b39328fefab9c
- */
-
-//Unfortunately, MinGW does not contain an implementation of strtok_r
-
-char* strtok_r(char *str, const char *delim, char **nextp) {
-    char *ret;
-
-    if (str == NULL) {
-        str = *nextp;
-    }
-
-    str += strspn(str, delim);
-    if (*str == '\0') {
-        return str;
-    }
-
-    ret = str;
-    str += strcspn(str, delim);
-    if (*str) {
-        *str++ = '\0';
-        if(*delim == '\r') {
-            *str++ = '\0';
-        }
-    }
-
-    *nextp = str;
-    return ret;
-}
-
-void to_upper(char* str) {
-
-    //Max length of received command is 512 bytes
-    for(int i = 0; i < 512; i++) {
-        if(str[i] == '\0') {
-            return;
-        }
-
-        str[i] = toupper(str[i]);
-    }
 }

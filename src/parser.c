@@ -9,6 +9,7 @@
 
 #include "socket.h"
 #include "commands.h"
+#include "helpers.h"
 #include "defines.h"
 
 struct channel* channels = NULL;
@@ -41,7 +42,7 @@ void handle_connection(struct user* usr) {
             send_privmsg(usr, strptr);
         }
         else if(strcmp(command, "PING") == 0) {
-            sock_send(usr->c_sock, "PONG", &server_name, strtok_r(NULL, " ", &strptr));
+            sock_send(usr->c_sock, "PONG", &server_name[0], strtok_r(NULL, " ", &strptr));
         }
         else if(strcmp(command, "CAP") == 0) {
             command = strtok_r(NULL, " ", &strptr);

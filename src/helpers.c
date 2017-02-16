@@ -4,6 +4,56 @@
 
 #include "defines.h"
 
+/*
+ * public domain strtok_r() by Charlie Gordon
+ *
+ *   from comp.lang.c  9/14/2007
+ *
+ *      http://groups.google.com/group/comp.lang.c/msg/2ab1ecbb86646684
+ *
+ *     (Declaration that it's public domain):
+ *      http://groups.google.com/group/comp.lang.c/msg/7c7b39328fefab9c
+ */
+
+//Unfortunately, MinGW does not contain an implementation of strtok_r
+
+char* strtok_r(char *str, const char *delim, char **nextp) {
+    char *ret;
+
+    if (str == NULL) {
+        str = *nextp;
+    }
+
+    str += strspn(str, delim);
+    if (*str == '\0') {
+        return str;
+    }
+
+    ret = str;
+    str += strcspn(str, delim);
+    if (*str) {
+        *str++ = '\0';
+        if(*delim == '\r') {
+            *str++ = '\0';
+        }
+    }
+
+    *nextp = str;
+    return ret;
+}
+
+void to_upper(char* str) {
+
+    //Max length of received command is 512 bytes
+    for(int i = 0; i < 512; i++) {
+        if(str[i] == '\0') {
+            return;
+        }
+
+        str[i] = toupper(str[i]);
+    }
+}
+
 void send_to_channel(struct channel* chn, char* hostname, char* command, char* target, char* message) {
     for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
         if(chn->users[i] == NULL) {
@@ -226,7 +276,8 @@ void set_ban(struct channel* chn, char* flag, char* args) {
             }
 
             ban = strtok_r(NULL, " ", &banptr);
-        }
+        }char* strtok_r(char *, const char *, char **);
+void to_upper(char*);
     }
 
     strcat(chn->bans, args);

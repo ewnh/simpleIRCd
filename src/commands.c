@@ -328,35 +328,22 @@ void user_part(struct user* usr, char* strptr) {
 }
 
 void user_quit(struct user* usr, char* message) {
+    struct channel* chn;
 
     //Loop over every channel the user belongs to
     for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
-        if(usr->channels[i] == NULL) {
+        chn = usr->channels[i];
+        if(chn == NULL) {
             break;
         }
 
-        //Loop over users in that channel and remove usr
-        for(int j = 0; j < CHANNEL_MAX_USERS; j++) {
-            if(usr->channels[i]->users[j] == usr) {
-                usr->channels[i]->users[j] = NULL;
+        remove_from_channel(chn, usr);
 
-                if(!check_remove_channel(usr->channels[i])) {
-                    send_to_channel(usr->channels[i], usr->nick, "QUIT", "", message);
-                }
-
-                break;
-            }
+        if(!check_remove_channel(chn)) {
+            send_to_channel(chn, usr->nick, "QUIT", "", message);
         }
     }
 
-    //Loop over each channel the user is connected to
-    for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
-        if(usr->channels[i] == NULL) {
-            continue;
-        }
-        //Reorder the channel's user array
-        reorder_user_array(usr->channels[i]->users);
-    }
     sock_send(usr->c_sock, "ERROR", ":Closing Link:", message);
 }
 

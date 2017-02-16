@@ -276,8 +276,7 @@ void set_ban(struct channel* chn, char* flag, char* args) {
             }
 
             ban = strtok_r(NULL, " ", &banptr);
-        }char* strtok_r(char *, const char *, char **);
-void to_upper(char*);
+        }
     }
 
     strcat(chn->bans, args);

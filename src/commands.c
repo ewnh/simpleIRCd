@@ -324,35 +324,7 @@ void user_part(struct user* usr, char* strptr) {
 
     send_to_channel(chn, usr->nick, "PART", chn->name, strtok_r(NULL, " ", &strptr));
 
-    for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
-        if(chn->users[i] == NULL && usr->channels[i] == NULL) {
-            break;
-        }
-
-        //Remove user from channel's users list
-        if(chn->users[i] == usr) {
-            chn->users[i] = NULL;
-        }
-
-        //Remove channel from user's channel list
-        if(usr->channels[i] == chn) {
-            usr->channels[i] = NULL;
-        }
-    }
-
-    if(!check_remove_channel(chn)) {
-        //Reorder channel's user array
-        reorder_user_array(chn->users);
-    }
-
-    //Reorder user's channel list
-    for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
-        if(usr->channels[i] == NULL) {
-            for(int j = i+1; j < CHANNEL_MAX_USERS; j++) {
-                usr->channels[j-1] = usr->channels[j];
-            }
-        }
-    }
+    remove_from_channel(chn, usr);
 }
 
 void user_quit(struct user* usr, char* message) {
@@ -508,33 +480,5 @@ void kick_user(struct user* usr, char* strptr) {
     sprintf(tempbuffer, "%s %s", kicked->nick, strtok_r(NULL, " ", &strptr));
     send_to_channel(chn, usr->nick, "KICK", chn->name, tempbuffer);
 
-    for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
-        if(chn->users[i] == NULL && usr->channels[i] == NULL) {
-            break;
-        }
-
-        //Remove user from channel's users list
-        if(chn->users[i] == kicked) {
-            chn->users[i] = NULL;
-        }
-
-        //Remove channel from user's channel list
-        if(kicked->channels[i] == chn) {
-            kicked->channels[i] = NULL;
-        }
-    }
-
-    if(!check_remove_channel(chn)) {
-        //Reorder channel's user array
-        reorder_user_array(chn->users);
-    }
-
-    //Reorder user's channel list
-    for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
-        if(kicked->channels[i] == NULL) {
-            for(int j = i+1; j < CHANNEL_MAX_USERS; j++) {
-                kicked->channels[j-1] = kicked->channels[j];
-            }
-        }
-    }
+    remove_from_channel(chn, kicked);
 }

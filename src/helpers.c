@@ -342,3 +342,35 @@ bool check_if_banned(struct channel* chn, struct user* usr) {
         ban = strtok_r(NULL, " ", &banptr);
     }
 }
+
+void remove_from_channel(struct channel* chn, struct user* usr) {
+    for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
+        if(chn->users[i] == NULL && usr->channels[i] == NULL) {
+            break;
+        }
+
+        //Remove user from channel's users list
+        if(chn->users[i] == usr) {
+            chn->users[i] = NULL;
+        }
+
+        //Remove channel from user's channel list
+        if(usr->channels[i] == chn) {
+            usr->channels[i] = NULL;
+        }
+    }
+
+    if(!check_remove_channel(chn)) {
+        //Reorder channel's user array
+        reorder_user_array(chn->users);
+    }
+
+    //Reorder user's channel list
+    for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
+        if(usr->channels[i] == NULL) {
+            for(int j = i+1; j < CHANNEL_MAX_USERS; j++) {
+                usr->channels[j-1] = usr->channels[j];
+            }
+        }
+    }
+}

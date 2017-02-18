@@ -1,6 +1,17 @@
+/** @file
+ *  @brief Header file for socket.c
+ */
+
 #ifndef SOCKET_H_INCLUDED
 #define SOCKET_H_INCLUDED
 
+/** @brief Ensures compatibility over Windows and Linux
+ *
+ *  Linux sockets have an integer type\n
+ *  Windows sockets have a specific SOCKET type
+ *
+ *  The value of SOCK is set based on the OS compiled on
+ */
 #ifdef _WIN32
 	#include <winsock2.h>
 	#define SOCK SOCKET

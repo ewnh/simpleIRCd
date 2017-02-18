@@ -1,6 +1,11 @@
+/** @file
+ *  @brief Contains network code
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 
+/** See socket.h */
 #ifdef _WIN32
 #include <winsock2.h>
 #define SOCK SOCKET //socket type
@@ -14,10 +19,14 @@
 
 #endif
 
-#pragma comment(lib, "ws2_32.lib")
-
+/** @brief Initialises the server.
+ *
+ *  Creates a server socket and binds it to port 10000, allowing users to connect.
+ *  @return Server socket
+ */
 SOCK server_setup() {
 
+    //Initialise Winsock
 	#ifdef _WIN32
     WSADATA wsa;
 
@@ -28,11 +37,13 @@ SOCK server_setup() {
     printf("Initialised Winsock\n");
 	#endif
 
+    //Create a socket
     SOCK sock;
     struct sockaddr_in server;
 
     sock = socket(AF_INET, SOCK_STREAM, 0);
 
+    //Check for errors
     #ifdef _WIN32
     if (sock == INVALID_SOCKET) {
         printf("Cannot create socket: %d\n", WSAGetLastError());
@@ -47,10 +58,12 @@ SOCK server_setup() {
 
 	printf("Socket Created\n");
 
+    //Set socket details
 	server.sin_family = AF_INET;
 	server.sin_addr.s_addr = INADDR_ANY;
 	server.sin_port = htons(10000);
 
+    //Bind to port 10000
 	int err = bind(sock, (struct sockaddr *)&server, sizeof(server));
 	#ifdef _WIN32
     if (err == SOCKET_ERROR) {
@@ -68,14 +81,21 @@ SOCK server_setup() {
 	return sock;
 }
 
+/** @brief Accepts a user connection.
+ *
+ *  Listens to server socket and accepts a new user connection.
+ *  @param sock Server socket
+ *  @return Socket containing user connection
+ */
 SOCK s_accept(SOCK sock) {
     struct sockaddr_in client;
 
-
+    //Wait for a user to connect
 	listen(sock, 1);
 	printf("Waiting\n");
 
 	int c = sizeof(struct sockaddr_in);
+	//Accept connection
     SOCK c_sock = accept(sock, (struct sockaddr *)&client, &c);
 
     #ifdef _WIN32
@@ -94,6 +114,10 @@ SOCK s_accept(SOCK sock) {
 	return c_sock;
 }
 
+/** @brief Sends data to a user.
+ *  @param c_sock User socket
+ *  @param message Data to send
+ */
 void s_send(SOCK c_sock, char* message) {
     #ifdef _WIN32
     if (send(c_sock, message, strlen(message), 0) == SOCKET_ERROR) {
@@ -108,26 +132,36 @@ void s_send(SOCK c_sock, char* message) {
 	#endif
 }
 
+/** @brief Receives data from a user.
+ *  @note Calls read(), which blocks
+ *  @param c_sock User socket
+ *  @param message Char array in which to store received data
+ */
 int s_recv(SOCK c_sock, char* message) {
     int recvbytes;
     int totalrecv = 0;
     do {
 
+        //Read from user socket
     	#ifdef _WIN32
         recvbytes = recv(c_sock, &message[totalrecv], 512-totalrecv, 0);
     	#else
         recvbytes = read(c_sock, &message[totalrecv], 512-totalrecv);
        	#endif
+
+       	//Check if connection closed
        	if(recvbytes == 0) {
             return 1;
        	}
 
         totalrecv += recvbytes;
 
+        //If the last two characters are \r\n, we known we have a valid IRC message
         for(int i = 0; i < 513; i++) {
             if(message[i] == '\r' && message[i+1] == '\n') {
                 return 0;
             }
         }
+    //Keep reading if we have not got a full message
     } while (recvbytes > 0);
 }

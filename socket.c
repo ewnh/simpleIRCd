@@ -156,8 +156,15 @@ int s_recv(SOCK c_sock, char* message) {
 
         totalrecv += recvbytes;
 
-        //If the last two characters are \r\n, we known we have a valid IRC message
-        for(int i = 0; i < 513; i++) {
+        //If we've already received 512 characters, add a line break (to print nicely)
+        //and return the filled buffer
+        if(totalrecv == 512) {
+            message[511] = '\n';
+            return 0;
+        }
+
+        //If the last two characters are \r\n, we know we have a valid IRC message
+        for(int i = 0; i < totalrecv; i++) {
             if(message[i] == '\r' && message[i+1] == '\n') {
                 return 0;
             }

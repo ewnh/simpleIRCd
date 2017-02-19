@@ -39,7 +39,7 @@ void handle_connection(struct user* hc) {
         //Print received data to the console
         printf("%i: %s", hc->c_sock, hc->message);
         //Clear message buffer
-        memset(hc->message, 0, 513);
+        memset(hc->message, '\0', 513);
     }
     //Close connection
     printf("Connection closed\n");

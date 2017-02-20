@@ -106,6 +106,7 @@ int get_users_in_channel(struct channel* chn) {
             return i;
         }
     }
+    return CHANNEL_MAX_USERS;
 }
 
 //Check if a channel needs removing and remove if necessary
@@ -129,6 +130,7 @@ bool get_flag(char* modes, char flag) {
             return true;
         }
     }
+    return false;
 }
 
 void set_flag(char* modes, char* flag) {
@@ -163,6 +165,7 @@ bool is_present(struct user** userlist, struct user* usr) {
             return true;
         }
     }
+    return false;
 }
 
 bool set_status(struct user** array, char* flag, char* args) {
@@ -340,6 +343,7 @@ bool check_if_banned(struct channel* chn, struct user* usr) {
 
         ban = strtok_r(NULL, " ", &banptr);
     }
+    return false;
 }
 
 void remove_from_channel(struct channel* chn, struct user* usr) {

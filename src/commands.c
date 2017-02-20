@@ -12,7 +12,8 @@ void join_channel(struct user* hc, char* strptr) {
     strcpy(buffer, strtok_r(NULL, " ", &strptr));
 
     if(strlen(buffer) > 50) {
-        printf("Channel name too long\n");
+        sprintf(buffer, "%s :Illegal channel name", buffer);
+        sock_send(hc->c_sock, "479", hc->nick, buffer);
         return;
     }
 

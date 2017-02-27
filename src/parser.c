@@ -106,9 +106,7 @@ void handle_connection(struct user* usr) {
             kick_user(usr, strptr);
         }
         else {
-            //Reuse message buffer - it's erased every loop iteration anyway
-            sprintf(message, "%s :Unknown command", command);
-            sock_send(usr->c_sock, "421", usr->nick, message);
+            send_error(NULL, usr, 421, command);
         }
     }
 

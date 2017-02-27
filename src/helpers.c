@@ -378,7 +378,7 @@ void remove_from_channel(struct channel* chn, struct user* usr) {
     }
 }
 
-void send_error(struct channel* chn, struct user* usr, int error, char* args) {
+void send_error(struct channel* chn, struct user* usr, int error, char* arg) {
     char buffer[64];
 
     char errorstr[4];
@@ -388,6 +388,12 @@ void send_error(struct channel* chn, struct user* usr, int error, char* args) {
 
     case 404:
         sprintf(buffer, "%s :Cannot send to channel", chn->name);
+        break;
+    case 421:
+        sprintf(buffer, "%s :Unknown command", arg);
+        break;
+    case 433:
+        sprintf(buffer, "%s :Nickname is already in use", arg);
         break;
     }
 

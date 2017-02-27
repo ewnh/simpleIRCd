@@ -240,9 +240,10 @@ void set_nick(struct user* usr, char* nick) {
     }
 
     else {
-        char error[50];
-        sprintf(error, "%s :Nickname is already in use", nick);
-        sock_send(usr->c_sock, "433", "*", error);
+        //Set nick to * to fit send_error()
+        usr->nick[0] = '*';
+        usr->nick[1] = '\0';
+        send_error(NULL, usr, 433, nick);
     }
 }
 

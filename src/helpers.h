@@ -21,5 +21,6 @@ void set_ban(struct channel*, char*, char*);
 void display_bans(struct channel*, struct user*);
 bool check_if_banned(struct channel*, struct user*);
 void remove_from_channel(struct channel*, struct user*);
+void send_error(struct channel*, struct user*, int, char*);
 
 #endif // HELPERS_H_INCLUDED

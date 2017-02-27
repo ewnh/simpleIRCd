@@ -116,8 +116,7 @@ void send_privmsg(struct user* usr, char* strptr) {
     bool n_forbidden = get_flag(chn->mode, 'n') && !is_present(chn->users, usr);
 
     if(m_forbidden || n_forbidden) {
-        sprintf(tempbuffer, "%s :Cannot send to channel", chn->name);
-        sock_send(usr->c_sock, "404", usr->nick, tempbuffer);
+        send_error(chn, usr, 404, "");
         return;
     }
 

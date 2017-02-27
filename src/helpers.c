@@ -377,3 +377,19 @@ void remove_from_channel(struct channel* chn, struct user* usr) {
         }
     }
 }
+
+void send_error(struct channel* chn, struct user* usr, int error, char* args) {
+    char buffer[64];
+
+    char errorstr[4];
+    sprintf(errorstr, "%i", error);
+
+    switch(error) {
+
+    case 404:
+        sprintf(buffer, "%s :Cannot send to channel", chn->name);
+        break;
+    }
+
+    sock_send(usr->c_sock, errorstr, usr->nick, buffer);
+}

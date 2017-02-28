@@ -1,3 +1,7 @@
+/** @file
+ *  @brief Header file for parser.c
+ */
+
 #ifndef PARSER_H_INCLUDED
 #define PARSER_H_INCLUDED
 

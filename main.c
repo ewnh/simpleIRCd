@@ -54,7 +54,9 @@ void handle_connection(struct user* hc) {
 /** @brief Program entry point
  *
  *  Accepts a connection and creates a new thread running handle_connection()
- *  @return Status
+ *
+ *  @see handle_connection()
+ *  @return Program status
  */
 int main()
 {

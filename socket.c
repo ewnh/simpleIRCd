@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-/** See socket.h */
+/** @see socket.h */
 #ifdef _WIN32
 #include <winsock2.h>
 #define SOCK SOCKET //socket type
@@ -136,6 +136,7 @@ void s_send(SOCK c_sock, char* message) {
  *  @note Calls read(), which blocks
  *  @param c_sock User socket
  *  @param message Char array in which to store received data
+ *  @return Connection status - 1 if connection closed, 0 if not
  */
 int s_recv(SOCK c_sock, char* message) {
     int recvbytes;

@@ -13,11 +13,11 @@
  *  The value of SOCK is set based on the OS compiled on
  */
 #ifdef _WIN32
-	#include <winsock2.h>
-	#define SOCK SOCKET
+    #include <winsock2.h>
+    #define SOCK SOCKET
 #else
-	#include <sys/socket.h>
-	#define SOCK int
+    #include <sys/socket.h>
+    #define SOCK int
 #endif
 
 SOCK server_setup();

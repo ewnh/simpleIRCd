@@ -45,7 +45,7 @@ void set_time() {
 SOCK server_setup() {
 
     //Initialise Winsock
-	#ifdef _WIN32
+    #ifdef _WIN32
     WSADATA wsa;
 
     if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0) {
@@ -53,7 +53,7 @@ SOCK server_setup() {
         exit(EXIT_FAILURE);
     }
     printf("Initialised Winsock\n");
-	#endif
+    #endif
 
     //Store the server hostname
     gethostname(server_name, sizeof(server_name));
@@ -70,40 +70,40 @@ SOCK server_setup() {
         printf("Cannot create socket: %d\n", WSAGetLastError());
         exit(EXIT_FAILURE);
     }
-	#else
+    #else
     if(sock < 0) {
         perror("Cannot create socket");
         exit(EXIT_FAILURE);
     }
-	#endif
+    #endif
 
-	printf("Socket Created\n");
+    printf("Socket Created\n");
 
-	//Set socket details
-	server.sin_family = AF_INET;
-	server.sin_addr.s_addr = INADDR_ANY;
-	server.sin_port = htons(10000);
+    //Set socket details
+    server.sin_family = AF_INET;
+    server.sin_addr.s_addr = INADDR_ANY;
+    server.sin_port = htons(10000);
 
     //Bind to port 10000
-	int err = bind(sock, (struct sockaddr *)&server, sizeof(server));
-	#ifdef _WIN32
+    int err = bind(sock, (struct sockaddr *)&server, sizeof(server));
+    #ifdef _WIN32
     if (err == SOCKET_ERROR) {
         printf("Bind failed: %d\n", WSAGetLastError());
         exit(EXIT_FAILURE);
     }
-	#else
+    #else
     if(err < 0) {
         perror("Bind failed");
         exit(EXIT_FAILURE);
     }
-	#endif
+    #endif
 
-	printf("Bind complete\n");
+    printf("Bind complete\n");
 
     //Set server startup time
-	set_time();
+    set_time();
 
-	return sock;
+    return sock;
 }
 
 /** @brief Shuts down the server.
@@ -113,7 +113,7 @@ SOCK server_setup() {
 void server_shutdown() {
     #ifdef _WIN32
     WSACleanup();
-	#endif
+    #endif
 }
 
 /** @brief Accepts a user connection.
@@ -126,10 +126,10 @@ SOCK sock_accept(SOCK sock) {
     struct sockaddr_in client;
 
     //Wait for a user to connect
-	listen(sock, 1);
-	printf("Waiting\n");
+    listen(sock, 1);
+    printf("Waiting\n");
 
-	int c = sizeof(struct sockaddr_in);
+    int c = sizeof(struct sockaddr_in);
     //Accept connection
     SOCK c_sock = accept(sock, (struct sockaddr *)&client, &c);
 
@@ -138,15 +138,15 @@ SOCK sock_accept(SOCK sock) {
         printf("Accept failed: %d\n", WSAGetLastError());
         exit(EXIT_FAILURE);
     }
-	#else
+    #else
     if(c_sock < 0) {
         perror("Accept failed");
         exit(EXIT_FAILURE);
     }
-	#endif
-	printf("Connection accepted\n");
+    #endif
+    printf("Connection accepted\n");
 
-	return c_sock;
+    return c_sock;
 }
 
 /** @brief Sends an IRC response to a user.
@@ -190,12 +190,12 @@ void sock_send_host(SOCK c_sock, char* hostname, char* command, char* target, ch
         printf("Send failed: %d\n", WSAGetLastError());
         exit(EXIT_FAILURE);
     }
-	#else
+    #else
     if(write(c_sock, response, strlen(response)) < 0) {
         perror("Send failed\n");
         exit(EXIT_FAILURE);
     }
-	#endif
+    #endif
 }
 
 /** @brief Wrapper over sock_send_host()
@@ -232,7 +232,7 @@ void sock_send(SOCK c_sock, char* command, char* target, char* message) {
  */
 int sock_recv(SOCK c_sock, char* message, char* buffer, char** strptr){
     int recvbytes = 1;
-    do {
+    while(1) {
         //Check if all stored data has been read
         if(**strptr == '\0') {
             //Reset buffer and strptr
@@ -248,16 +248,21 @@ int sock_recv(SOCK c_sock, char* message, char* buffer, char** strptr){
         }
 
         //Check if connection closed
-       	if(recvbytes == 0) {
+        if(recvbytes == 0) {
             return 1;
-       	}
+        }
+
+        //Check if the first character received is \r or \n. If so, this is an empty
+        //message so skip it and receive more data
+        if(buffer[0] == '\r' || buffer[0] == '\n') {
+            buffer[0] = '\0';
+            continue;
+        }
 
         //Copy next command in message array
         strcpy(message, strtok_r(NULL, "\r", strptr));
         return 0;
-
-    //Keep reading if we have not got a full message
-    } while (recvbytes > 0);
+    }
 }
 
 /** @brief Close a socket

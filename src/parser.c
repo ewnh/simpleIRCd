@@ -26,10 +26,6 @@ struct channel* channels = NULL;
  *  @param hc User struct
  */
 void handle_connection(struct user* hc) {
-
-    //Set user variables
-    hc->is_cap_negotiating = 0;
-
     //Initialise variables required to receive messages
     char message[513];
     char recvbuffer[513];
@@ -67,13 +63,8 @@ void handle_connection(struct user* hc) {
 
             //Display IRCv3 Capacities
             if(strcmp(command, "LS") == 0) {
-                hc->is_cap_negotiating = 1;
                 //But we don't support any, so send an empty parameter
                 sock_send(hc->c_sock, "CAP", "*", "LS :");
-            }
-            //Send registrations messages now capacity negotiation has finished
-            else if(strcmp(command, "END") == 0 && hc->is_cap_negotiating == 1) {
-                send_registration_messages(hc->c_sock, hc->nick, hc->username);
             }
         }
         else if(strcmp(command, "NICK") == 0) {
@@ -99,10 +90,7 @@ void handle_connection(struct user* hc) {
             char* realnm = strtok_r(NULL, " ", &strptr);
             strcpy(hc->realname, realnm++);
 
-            //If client doesn't want to do IRCv3 capacity negotiation
-            if(hc->is_cap_negotiating == 0) {
-                send_registration_messages(hc->c_sock, hc->nick, hc->username);
-            }
+            send_registration_messages(hc->c_sock, hc->nick, hc->username);
         }
         else if(strcmp(command, "JOIN") == 0) {
             join_channel(&channels, hc, strtok_r(NULL, " ", &strptr));

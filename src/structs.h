@@ -15,8 +15,6 @@
 struct user {
     /** Socket the user is connected to */
     SOCK c_sock;
-    /** Set to 1 if the user currently using CAP commands, otherwise 0 */
-    int is_cap_negotiating;
     /** User's nickname, set using the NICK command */
     char nick[10];
     /** User's username, set using the USER command */

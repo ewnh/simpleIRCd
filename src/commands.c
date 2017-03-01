@@ -100,7 +100,7 @@ void join_channel(struct channel** channels, struct user* hc, char* name) {
  *  @param sender Nickname of the user that sent the message
  *  @param raw_message Message to send
  */
-void send_privmsg(struct channel** channels, char* target, char* sender, char* raw_message) {
+void send_privmsg(struct channel** channels, char* target, char* sender, char* message) {
 
     //Find channel in hashtable
     struct channel* chn;
@@ -112,7 +112,7 @@ void send_privmsg(struct channel** channels, char* target, char* sender, char* r
     }
 
     //Send message to channel
-    send_to_channel(chn, sender, "PRIVMSG", target, raw_message);
+    send_to_channel(chn, sender, "PRIVMSG", target, message);
 }
 
 /** @brief Send registrations messages to a newly joined user.

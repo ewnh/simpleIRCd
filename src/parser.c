@@ -55,8 +55,7 @@ void handle_connection(struct user* hc) {
         //Execute the appropriate code if the command is valid
         if(strcmp(command, "PRIVMSG") == 0) {
             char* target = strtok_r(NULL, " ", &strptr);
-            char* message = strtok_r(NULL, " ", &strptr);
-            send_privmsg(&channels, target, hc->nick, message);
+            send_privmsg(&channels, target, hc->nick, strptr);
         }
         else if(strcmp(command, "PING") == 0) {
             //PONG response, used by client to verify server is still responding

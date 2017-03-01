@@ -26,6 +26,11 @@ struct channel* channels = NULL;
  *  @param hc User struct
  */
 void handle_connection(struct user* hc) {
+    //Set user variables
+    hc->nick[0] = '\0';
+    hc->username[0] = '\0';
+    hc->realname[0] = '\0';
+
     //Initialise variables required to receive messages
     char message[513];
     char recvbuffer[513];
@@ -68,12 +73,24 @@ void handle_connection(struct user* hc) {
             }
         }
         else if(strcmp(command, "NICK") == 0) {
+            char* nick = strtok_r(NULL, " ", &strptr);
+
+            //Ignore this command if given nickname is too big
+            if(strlen(nick) > 10) {
+                continue;
+            }
             //Set user nick as specified
-            strcpy(hc->nick, strtok_r(NULL, " ", &strptr));
+            strcpy(hc->nick, nick);
         }
         else if(strcmp(command, "USER") == 0) {
+            char* username = strtok_r(NULL, " ", &strptr);
+
+            //Ignore if username is too long
+            if(strlen(username) > 20) {
+                continue;
+            }
             //Store next word as the user's username
-            strcpy(hc->username, strtok_r(NULL, " ", &strptr));
+            strcpy(hc->username, username);
 
             //Clear user's mode array
             memset(hc->modes, '\0', 7);
@@ -88,9 +105,16 @@ void handle_connection(struct user* hc) {
 
             //Store next word as the user's real name
             char* realnm = strtok_r(NULL, " ", &strptr);
+
+            //Ignore if string is too large
+            if(strlen(realnm) > 20) {
+                continue;
+            }
             strcpy(hc->realname, realnm++);
 
-            send_registration_messages(hc->c_sock, hc->nick, hc->username);
+            if(hc->nick[0] != '\0' && hc->username[0] != '\0' && hc->realname[0] != '\0') {
+                send_registration_messages(hc->c_sock, hc->nick, hc->username);
+            }
         }
         else if(strcmp(command, "JOIN") == 0) {
             join_channel(&channels, hc, strtok_r(NULL, " ", &strptr));

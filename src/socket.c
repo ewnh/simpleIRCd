@@ -171,6 +171,7 @@ void sock_send_host(SOCK c_sock, char* hostname, char* command, char* target, ch
         printf("Command: %s\n", command);
         printf("Target: %s\n", target);
         printf("Message: %s\n", message);
+        return;
     }
 
     //Assemble the full message by concatenating each char array together

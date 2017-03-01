@@ -181,11 +181,11 @@ int sock_recv(SOCK c_sock, char* message, char* buffer, char** strptr){
                 }
 
                 totalbytes += recvbytes;
-                //Check if 512 bytes have been received
-                if(totalbytes == 512) {
+                //Check if 512 bytes have been received, or if the message is empty
+                if(totalbytes == 512 || buffer[0] == '\r' || buffer[0] == '\n') {
                     //Ignore invalid received data
-                    message[0] = '\0';
-                    return 0;
+                    totalbytes = 0;
+                    continue;
                 }
                 //Check if the last two received characters are \r\n
                 if(buffer[totalbytes-2] == '\r' && buffer[totalbytes-1] == '\n') {

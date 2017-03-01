@@ -53,6 +53,11 @@ void join_channel(struct channel** channels, struct user* hc, char* name) {
         return;
     }
 
+    //Return if the user has not fully registered with the server
+    if(hc->nick[0] == '\0' || hc->username[0] == '\0' || hc->realname[0] == '\0') {
+        return;
+    }
+
     //Find specified channel in hashtable
     struct channel* chn;
     HASH_FIND_STR(*channels, name, chn);

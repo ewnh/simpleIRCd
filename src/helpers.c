@@ -54,6 +54,48 @@ void to_upper(char* str) {
     }
 }
 
+void send_error(struct channel* chn, struct user* usr, int error, char* arg) {
+    char buffer[64];
+
+    char errorstr[4];
+    sprintf(errorstr, "%i", error);
+
+    switch(error) {
+    case 403:
+        sprintf(buffer, "%s :No such channel", arg);
+        break;
+    case 404:
+        sprintf(buffer, "%s :Cannot send to channel", chn->name);
+        break;
+    case 421:
+        sprintf(buffer, "%s :Unknown command", arg);
+        break;
+    case 433:
+        sprintf(buffer, "%s :Nickname is already in use", arg);
+        break;
+    case 471:
+        sprintf(buffer, "%s :Cannot join channel (+l)", chn->name);
+        break;
+    case 472:
+        sprintf(buffer, "%s :is unknown mode char to me for %s", arg, chn->name);
+        break;
+    case 474:
+        sprintf(buffer, "%s :Cannot join channel (+b)", chn->name);
+        break;
+    case 475:
+        sprintf(buffer, "%s :Cannot join channel (+k)", chn->name);
+        break;
+    case 479:
+        sprintf(buffer, "%s :Illegal channel name", arg);
+        break;
+    case 482:
+        sprintf(buffer, "%s :You're not a channel operator", chn->name);
+        break;
+    }
+
+    sock_send(usr->c_sock, errorstr, usr->nick, buffer);
+}
+
 void send_to_channel(struct channel* chn, char* hostname, char* command, char* target, char* message) {
     for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
         if(chn->users[i] == NULL) {
@@ -75,11 +117,7 @@ struct channel* get_channel(struct user* usr, char* chn_name) {
     HASH_FIND_STR(channels, chn_name, chn);
 
     if(chn == NULL) {
-        char error[67]; //Max channel name length (50) + length of text
-        sprintf(error, "%s :No such channel", chn_name);
-
-        sock_send(usr->c_sock, "403", usr->nick, error);
-
+        send_error(NULL, usr, 403, chn_name);
         return NULL;
     }
 
@@ -255,7 +293,6 @@ void set_ban(struct channel* chn, char* flag, char* args) {
                 return;
             }
 
-            //TODO: this only kinda works
             if(strcmp(ban, args) == 0) {
                 int len = strlen(ban);
                 for(int j = 0; j < len; j++) {
@@ -376,26 +413,4 @@ void remove_from_channel(struct channel* chn, struct user* usr) {
             }
         }
     }
-}
-
-void send_error(struct channel* chn, struct user* usr, int error, char* arg) {
-    char buffer[64];
-
-    char errorstr[4];
-    sprintf(errorstr, "%i", error);
-
-    switch(error) {
-
-    case 404:
-        sprintf(buffer, "%s :Cannot send to channel", chn->name);
-        break;
-    case 421:
-        sprintf(buffer, "%s :Unknown command", arg);
-        break;
-    case 433:
-        sprintf(buffer, "%s :Nickname is already in use", arg);
-        break;
-    }
-
-    sock_send(usr->c_sock, errorstr, usr->nick, buffer);
 }

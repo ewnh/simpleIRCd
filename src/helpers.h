@@ -6,6 +6,7 @@
 
 char* strtok_r(char *, const char *, char **);
 void to_upper(char*);
+void send_error(struct channel*, struct user*, int, char*);
 void send_to_channel(struct channel*, char*, char*, char*, char*);
 struct channel* get_channel(struct user*, char*);
 void reorder_user_array(struct user**);
@@ -21,6 +22,5 @@ void set_ban(struct channel*, char*, char*);
 void display_bans(struct channel*, struct user*);
 bool check_if_banned(struct channel*, struct user*);
 void remove_from_channel(struct channel*, struct user*);
-void send_error(struct channel*, struct user*, int, char*);
 
 #endif // HELPERS_H_INCLUDED

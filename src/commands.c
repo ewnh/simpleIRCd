@@ -12,8 +12,7 @@ void join_channel(struct user* hc, char* strptr) {
     strcpy(buffer, strtok_r(NULL, " ", &strptr));
 
     if(strlen(buffer) > 50) {
-        sprintf(buffer, "%s :Illegal channel name", buffer);
-        sock_send(hc->c_sock, "479", hc->nick, buffer);
+        send_error(NULL, hc, 479, buffer);
         return;
     }
 
@@ -52,20 +51,17 @@ void join_channel(struct user* hc, char* strptr) {
     else {
         //If channel limit reached
         if(chn->limit == get_users_in_channel(chn)) {
-            sprintf(buffer, "%s :Cannot join channel (+l)", chn->name);
-            sock_send(hc->c_sock, "471", hc->nick, buffer);
+            send_error(chn, hc, 471, NULL);
             return;
         }
         //Password check
         if(get_flag(chn->mode, 'k') && strcmp(chn->password, strtok_r(NULL, " ", &strptr)) != 0) {
-            sprintf(buffer, "%s :Cannot join channel (+k)", chn->name);
-            sock_send(hc->c_sock, "475", hc->nick, buffer);
+            send_error(chn, hc, 475, NULL);
             return;
         }
         //If banned
         if(check_if_banned(chn, hc)) {
-            sprintf(buffer, "%s :Cannot join channel (+b)", chn->name);
-            sock_send(hc->c_sock, "474", hc->nick, buffer);
+            send_error(chn, hc, 474, NULL);
             return;
         }
         //Add user pointer to channel's users array
@@ -198,9 +194,7 @@ void set_topic(struct user* usr, char* strptr) {
     }
 
     if(get_flag(chn->mode, 't') && !is_present(chn->operators, usr)) {
-        char tempbuffer[64];
-        sprintf(tempbuffer, "%s :You're not a channel operator", chn->name);
-        sock_send(usr->c_sock, "482", usr->nick, tempbuffer);
+        send_error(chn, usr, 482, NULL);
         return;
     }
 
@@ -395,8 +389,7 @@ void set_mode(struct user* usr, char* strptr) {
 
         //All other mode actions require op privileges
         if(!is_present(chn->users, usr)) {
-            sprintf(flag, "%s :You're not a channel operator", chn->name);
-            sock_send(usr->c_sock, "482", usr->nick, flag);
+            send_error(chn, usr, 482, NULL);
             return;
         }
 
@@ -438,8 +431,7 @@ void set_mode(struct user* usr, char* strptr) {
             set_ban(chn, flag, args);
             break;
         default:
-            sprintf(flag, "%s :is unknown mode char to me for %s", flag, chn->name);
-            sock_send(usr->c_sock, "472", usr->nick, flag);
+            send_error(chn, usr, 472, flag);
             return;
         }
 

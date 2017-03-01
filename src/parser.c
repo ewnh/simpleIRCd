@@ -18,7 +18,7 @@ struct user* users = NULL;
 void handle_connection(struct user* usr) {
 
     memset(usr->channels, 0, sizeof(usr->channels));
-    usr->nick[0] = '\0';
+    usr->is_registered = false;
 
     char message[513];
     char recvbuffer[513];
@@ -37,6 +37,30 @@ void handle_connection(struct user* usr) {
         char* command = strtok_r(message, " ", &strptr);
         to_upper(command);
 
+        if(strcmp(command, "NICK") == 0) {
+            set_nick(usr, strtok_r(NULL, " ", &strptr));
+            continue;
+        }
+        else if(strcmp(command, "USER") == 0) {
+            strcpy(usr->username, strtok_r(NULL, " ", &strptr));
+
+            //Ignore next two parameters; not used
+            strtok_r(NULL, " ", &strptr);
+            strtok_r(NULL, " ", &strptr);
+
+            char* realnm = strtok_r(NULL, " ", &strptr);
+            strcpy(usr->realname, ++realnm);
+
+            usr->is_registered = true;
+
+            send_registration_messages(usr->c_sock, usr->nick, usr->username, usr->address);
+            continue;
+        }
+
+        if(!usr->is_registered) {
+            continue;
+        }
+
         if(strcmp(command, "PRIVMSG") == 0) {
             send_privmsg(usr, strptr);
         }
@@ -51,21 +75,6 @@ void handle_connection(struct user* usr) {
                 //But we don't support any, so send an empty parameter
                 sock_send(usr->c_sock, "CAP", "*", "LS :");
             }
-        }
-        else if(strcmp(command, "NICK") == 0) {
-            set_nick(usr, strtok_r(NULL, " ", &strptr));
-        }
-        else if(strcmp(command, "USER") == 0) {
-            strcpy(usr->username, strtok_r(NULL, " ", &strptr));
-
-            //Ignore next two parameters; not used
-            strtok_r(NULL, " ", &strptr);
-            strtok_r(NULL, " ", &strptr);
-
-            char* realnm = strtok_r(NULL, " ", &strptr);
-            strcpy(usr->realname, ++realnm);
-
-            send_registration_messages(usr->c_sock, usr->nick, usr->username, usr->address);
         }
         else if(strcmp(command, "JOIN") == 0) {
             join_channel(usr, strptr);

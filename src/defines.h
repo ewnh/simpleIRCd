@@ -1,6 +1,7 @@
 #ifndef STRUCTS_H_INCLUDED
 #define STRUCTS_H_INCLUDED
 
+#include <stdbool.h>
 #include "../lib/uthash.h"
 #include "socket.h"
 
@@ -16,6 +17,7 @@ extern struct user* users;
 struct user {
     SOCK c_sock;
     char address[16];
+    bool is_registered;
     char nick[10];
     char username[20];
     char realname[20];

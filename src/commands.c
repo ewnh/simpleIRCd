@@ -210,12 +210,12 @@ void set_nick(struct user* usr, char* nick) {
 
     if(tempusr == NULL) {
         //If nick previously set
-        if(usr->nick[0] != '\0') {
+        if(usr->is_registered) {
             HASH_DEL(users, usr);
         }
 
         //If user isn't in any channels and this is a nick change
-        if(usr->channels[0] == NULL && usr->nick[0] != '\0') {
+        if(usr->channels[0] == NULL && usr->is_registered) {
             sock_send_host(usr->c_sock, usr->nick, "NICK", "", nick);
         }
         //Loop over channels and send a channel message

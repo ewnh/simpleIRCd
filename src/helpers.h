@@ -1,3 +1,7 @@
+/** @file
+ *  @brief Header file for helpers.c
+ */
+
 #ifndef HELPERS_H_INCLUDED
 #define HELPERS_H_INCLUDED
 

@@ -4,19 +4,23 @@
 
 #include "defines.h"
 
-/*
- * public domain strtok_r() by Charlie Gordon
+/** @brief Implementation of strtok_r() - splits char arrays on the delimiter character.
  *
- *   from comp.lang.c  9/14/2007
+ *  @warning Destructive - removes delimiter character(s) from original string, and replaces
+ *  with NULL character(s)
  *
- *      http://groups.google.com/group/comp.lang.c/msg/2ab1ecbb86646684
+ *  @note MinGW does not contain an implementation of strtok_r, making this necessary
  *
- *     (Declaration that it's public domain):
- *      http://groups.google.com/group/comp.lang.c/msg/7c7b39328fefab9c
+ *  @note Public domain strtok_r() by Charlie Gordon from comp.lang.c  9/14/2007
+ *  @note http://groups.google.com/group/comp.lang.c/msg/2ab1ecbb86646684
+ *  @note (Declaration that it's public domain):
+ *  @note http://groups.google.com/group/comp.lang.c/msg/7c7b39328fefab9c
+ *
+ *  @param str Char array to split - may be NULL when splitting multiple times
+ *  @param delim Character to split on when encountered
+ *  @param nextp Pointer pointing at location of last split; modified internally
+ *  @return Pointer to char array containing string resulting from split
  */
-
-//Unfortunately, MinGW does not contain an implementation of strtok_r
-
 char* strtok_r(char *str, const char *delim, char **nextp) {
     char *ret;
 
@@ -42,27 +46,47 @@ char* strtok_r(char *str, const char *delim, char **nextp) {
     return ret;
 }
 
+/** @brief Converts a character array into uppercase.
+ *  @param str String to convert
+ */
 void to_upper(char* str) {
 
-    //Max length of received command is 512 bytes
+    //Loop over the array - max length of received command is 512 bytes
     for(int i = 0; i < 512; i++) {
         if(str[i] == '\0') {
             return;
         }
 
+        //Convert each character to uppercase
         str[i] = toupper(str[i]);
     }
 }
 
+/** @brief Send an error message to a user.
+ *
+ *  Both the chn and arg arguments are optional, and the passed values for each
+ *  depend on the error being sent. This is because some errors are not related
+ *  to a channel, and some errors require additional information
+ *  (e.g. Invalid command, which requires an additional argument but no channel struct).
+ *
+ *  @param chn Pointer to channel struct
+ *  @param usr Pointer to user struct
+ *  @param error Error numeric
+ *  @param arg Optional additional argument
+ */
 void send_error(struct channel* chn, struct user* usr, int error, char* arg) {
     char buffer[64];
 
+    //Convert the error numeric into a char array
     char errorstr[4];
     sprintf(errorstr, "%i", error);
 
+    //Switch on the numeric to determine the appropriate action to take
     switch(error) {
     case 403:
+        //Add the formatted error message to the buffer
         sprintf(buffer, "%s :No such channel", arg);
+        //And exit this switch statement
         break;
     case 404:
         sprintf(buffer, "%s :Cannot send to channel", chn->name);
@@ -93,10 +117,21 @@ void send_error(struct channel* chn, struct user* usr, int error, char* arg) {
         break;
     }
 
+    //Send the error message to the user
     sock_send(usr->c_sock, errorstr, usr->nick, buffer);
 }
 
+/** @brief Sends a message to every user in a channel.
+ *
+ *  Used by commands such as PRIVMSG.
+ *  @param chn Pointer to channel the message should be sent to
+ *  @param hostname Hostname to prefix the message with
+ *  @param command Command to send
+ *  @param target Target of the message (generally the channel)
+ *  @param message Message to send
+ */
 void send_to_channel(struct channel* chn, char* hostname, char* command, char* target, char* message) {
+    //Loop over every user in the channel
     for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
         if(chn->users[i] == NULL) {
             return;
@@ -107,25 +142,42 @@ void send_to_channel(struct channel* chn, char* hostname, char* command, char* t
             continue;
         }
 
+        //Send the message to each user
         sock_send_host(chn->users[i]->c_sock, hostname, command, target, message);
     }
 }
 
+/** @brief Retrieve a channel struct from the channels hashtable.
+ *  @param chn_name Name of channel to retrieve
+ *  @return Pointer to the appropriate channel struct
+ */
 struct channel* get_channel(struct user* usr, char* chn_name) {
 
+    //Look up the channel in the hashtable
     struct channel* chn;
     HASH_FIND_STR(channels, chn_name, chn);
 
+    //If the channel doesn't exist, send an error message
     if(chn == NULL) {
         send_error(NULL, usr, 403, chn_name);
         return NULL;
     }
 
+    //Otherwise, return the channel
     return chn;
 }
 
-//Rearrange user array so there is a continuous set of elements
-//Used to fill in any null references, ensuring null only occurs at the end of an array
+/** @brief Rearrange a user array so there is a continuous set of elements.
+ *
+ *  The user array is reordered so that it contains a continuous set of elements,
+ *  followed by NULL references. This is done because every command that loops over
+ *  the user list of a channel breaks when encountering a NULL reference - this is because
+ *  it would be inefficient to keep searching the whole array. However, this means
+ *  that any users separated by a NULL reference cannot be reached, meaning that the
+ *  array must be reordered every time the ordering of the array changes (e.g. PART commands).
+ *
+ *  @param usrs Pointer to an array of user pointers
+ */
 void reorder_user_array(struct user** usrs) {
     //Loop over users
     for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
@@ -138,16 +190,29 @@ void reorder_user_array(struct user** usrs) {
     }
 }
 
+/** @brief Get the number of users in a channel.
+ *  @param chn Pointer to the channel to check
+ *  @return Number of users in the channel
+ */
 int get_users_in_channel(struct channel* chn) {
+    //Loop over each users
     for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
+        //When a NULL reference, we know we have found the last user, so return this number
         if(chn->users[i] == NULL) {
             return i;
         }
     }
+    //If the loop doesn't terminate as above, the array must be full
     return CHANNEL_MAX_USERS;
 }
 
-//Check if a channel needs removing and remove if necessary
+/** @brief Check if a channel should be deleted, and do so if necessary.
+ *
+ *  Checks whether there are any users left in the channel. If there are none,
+ *  the channel is deleted. Called by user_quit()
+ *  @param chn Pointer to the channel to check
+ *  @return Whether the channel was deleted or not
+ */
 bool check_remove_channel(struct channel* chn) {
 
     if(get_users_in_channel(chn) == 0) {

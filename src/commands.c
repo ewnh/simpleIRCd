@@ -13,7 +13,7 @@ extern char startup_time;
 
 /** @brief Sends a message to every user in a channel.
  *
- *  Used  by commands that need to send a custom hostname (e.g. send_privmsg()).
+ *  Used by commands that need to send a custom hostname (e.g. send_privmsg()).
  *  @note Accepts arguments similar to sock_send_host()
  *  @param chn Channel to send message to
  *  @param hostname Server hostname

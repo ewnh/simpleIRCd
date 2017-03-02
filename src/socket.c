@@ -1,6 +1,7 @@
 /** @file
  *  @brief Contains networking functions (and strtok_r()).
  */
+ 
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -221,7 +222,7 @@ void sock_send(SOCK c_sock, char* command, char* target, char* message) {
  *  Initially, reads data from the user socket and stores it in the buffer char array.
  *  The first IRC message is then copied into the message char array.
  *  Any further calls to sock_recv() will check if there is any unread data left
- *  (strptr will point at a NULL character), and, if there is, the next message
+ *  (strptr will not point at a NULL character), and, if there is, the next message
  *  will be copied. Once all data has been read, more data will be retrieved from the socket.
  *
  *  @note Calls read(), which blocks

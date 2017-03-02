@@ -1,3 +1,6 @@
+/** @file
+ *  @brief Contains helper functions
+ */
 #include <stdio.h>
 #include <ctype.h>
 #include <stdbool.h>
@@ -24,24 +27,33 @@
 char* strtok_r(char *str, const char *delim, char **nextp) {
     char *ret;
 
+    //If passed in array is empty, set pointer to location of last split
     if (str == NULL) {
         str = *nextp;
     }
 
+    //Find occurrences of delimiter in string
     str += strspn(str, delim);
+    //If none, return string
     if (*str == '\0') {
         return str;
     }
 
+    //Store new string
     ret = str;
+    //Find delimiter characters
     str += strcspn(str, delim);
+
+    //Remove delimiter(s)
     if (*str) {
         *str++ = '\0';
+        //If delimiter is \r, set the next character (\n) to NULL
         if(*delim == '\r') {
             *str++ = '\0';
         }
     }
 
+    //Move pointer forwards
     *nextp = str;
     return ret;
 }
@@ -123,7 +135,7 @@ void send_error(struct channel* chn, struct user* usr, int error, char* arg) {
 
 /** @brief Sends a message to every user in a channel.
  *
- *  Used by commands such as PRIVMSG.
+ *  Used by commands such as send_privmsg()
  *  @param chn Pointer to channel the message should be sent to
  *  @param hostname Hostname to prefix the message with
  *  @param command Command to send
@@ -176,7 +188,7 @@ struct channel* get_channel(struct user* usr, char* chn_name) {
  *  that any users separated by a NULL reference cannot be reached, meaning that the
  *  array must be reordered every time the ordering of the array changes (e.g. PART commands).
  *
- *  @param usrs Pointer to an array of user pointers
+ *  @param usrs Pointer to an array of user pointers to sort
  */
 void reorder_user_array(struct user** usrs) {
     //Loop over users
@@ -211,12 +223,15 @@ int get_users_in_channel(struct channel* chn) {
  *  Checks whether there are any users left in the channel. If there are none,
  *  the channel is deleted. Called by user_quit()
  *  @param chn Pointer to the channel to check
- *  @return Whether the channel was deleted or not
+ *  @return True if the channel was deleted, false otherwise
  */
 bool check_remove_channel(struct channel* chn) {
 
+    //If there are no users left in the channel
     if(get_users_in_channel(chn) == 0) {
+        //Remove the channel from the hashtable
         HASH_DEL(channels, chn);
+        //And free the allocated memory
         free(chn);
         return true;
     }
@@ -224,11 +239,19 @@ bool check_remove_channel(struct channel* chn) {
     return false;
 }
 
+/** @brief Check if a channel has a certain mode flag set.
+ *  @param modes Char array containing the channel's modes
+ *  @param flag Flag to search for
+ *  @return True if the flag has been set, false otherwise
+ */
 bool get_flag(char* modes, char flag) {
+    //Loop over each flag
     for(int i = 0; i < CHANNEL_MAX_FLAGS; i++) {
+        //If the end of the array has been reached, the flag isn't set
         if(modes[i] == '\0') {
             return false;
         }
+        //If the flag has been found, return true
         if(modes[i] == flag) {
             return true;
         }
@@ -236,18 +259,25 @@ bool get_flag(char* modes, char flag) {
     return false;
 }
 
+/** @brief Sets a mode flag for a channel
+ *  @brief modes Char array containing the channel's modes
+ *  @brief flag Flag to set
+ */
 void set_flag(char* modes, char* flag) {
-    //If adding a flag
+    //If the first character is +, the flag is being added
     if(flag[0] == '+') {
+        //Loop over every set flag
         for(int i = 0; i < CHANNEL_MAX_FLAGS; i++) {
+            //Set the new flag in the first available space
             if(modes[i] == '\0') {
                 modes[i] = flag[1];
                 return;
             }
         }
     }
-    //Otherwise, remove it
+    //Otherwise, the flag is being removed
     else {
+        //Loop over every flag and remove the specified flag
         for(int i = 0; i < CHANNEL_MAX_FLAGS; i++) {
             if(modes[i] == flag[1]) {
                 modes[i] = '\0';
@@ -257,13 +287,23 @@ void set_flag(char* modes, char* flag) {
     }
 }
 
-//Searches given user array for given user
-//Used to check if user is chanop or voiced
+/** @brief Searches a user array for a given user.
+ *
+ *  Used to determine whether a user is present in a channel, and whether the
+ *  user is an operator or voiced.
+ *
+ *  @param userlist Pointer to the array of user pointers
+ *  @param usr User struct to search for
+ *  @return True if the user is present, false otherwise
+ */
 bool is_present(struct user** userlist, struct user* usr) {
+    //Loop over every user
     for(int i = 0; i < 256; i++) {
+        //If the end of the array is reached, the user isn't present
         if(userlist[i] == NULL) {
             return false;
         }
+        //If they are, return true
         if(userlist[i] == usr) {
             return true;
         }
@@ -271,25 +311,39 @@ bool is_present(struct user** userlist, struct user* usr) {
     return false;
 }
 
+/** @brief Adds/removes a user to/from a given user array.
+ *  @param array Pointer to a user array
+ *  @param flag Mode flag, specifying how to change the array (e.g. +o, -v)
+ *  @param args Nickname of the user to add/remove
+ *  @return True if the user has successfully been added/removed, false otherwise
+ */
 bool set_status(struct user** array, char* flag, char* args) {
+    //Find the specified user in the users hashtable
     struct user* op;
     HASH_FIND_STR(users, args, op);
 
+    //Return if they don't exist
     if(op == NULL) {
         return false;
     }
 
+    //If the first character of the flag is -, we are removing this user
     if(flag[0] == '-') {
+        //Loop over given array
         for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
+            //Remove the user if found
             if(array[i] == op) {
                 array[i] = NULL;
                 return true;
             }
         }
+        //If the user isn't present, return false
         return false;
     }
 
+    //Otherwise, we are adding the user to the array
     for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
+        //Loop over the array and add them in the next available space
         if(array[i] == NULL) {
             array[i] = op;
             return true;
@@ -298,80 +352,113 @@ bool set_status(struct user** array, char* flag, char* args) {
     return false;
 }
 
+/** @brief Sets the user limit of a channel.
+ *  @param chn Pointer to channel struct being modified
+ *  @param flag Flag, determining whether the limit is being changed or removed
+ *  @param args New user limit
+ *  @return True if the user limit has been changed, false otherwise
+ */
 bool set_user_limit(struct channel* chn, char* flag, char* args) {
-    //Remove limit
+    //If the first character of the flag is -, remove the limit
     if(flag[0] == '-' && get_flag(chn->mode, 'l')) {
+        //Set the limit to default
         chn->limit = CHANNEL_MAX_USERS;
+        //Remove the flag
         set_flag(chn->mode, "-l");
         return true;
     }
-    //Otherwise, change limit
+    //Otherwise, change the limit
     else {
         //Check if args is an int
         for(int i = 0; i < 8; i++) {
-
-            //If null encountered and an argument (length > 0) is present
+            //If null encountered and an argument (length > 0) is present, args is an int
             if(args[i] == '\0' && i > 0) {
                 break;
             }
 
+            //If one of the character is not an int, return false
             if(!isdigit(args[i])) {
                 return false;
             }
         }
 
+        //Set the new channel limit
         chn->limit = atoi(args);
+        //Add the limit flag
         set_flag(chn->mode, "+l");
         return true;
     }
     return false;
 }
 
+/** @brief Sets the password (channel key) of a channel.
+ *  @param chn Pointer to channel struct being modified
+ *  @param flag Flag, determining whether the password is being changed or removed
+ *  @param args New password
+ *  @return True if the password has been changed, false otherwise
+ */
 bool set_channel_pass(struct channel* chn, char* flag, char* args) {
-    //Remove password
+    //If the first character of the flag is -, remove the password
     if(flag[0] == '-' && get_flag(chn->mode, 'k')) {
+        //Remove the password
         chn->password[0] = '\0';
+        //Remove the flag
         set_flag(chn->mode, "-k");
         return true;
     }
     else {
-        //No argument provided
+        //If no argument provided
         if(args[0] == '\0') {
             return false;
         }
 
+        //Set the new password
         strcpy(chn->password, args);
+        //Set the correct flag
         set_flag(chn->mode, "+k");
     }
     return true;
 }
 
-//Returns true if mode message should be sent to channel
+/** @brief Add/remove a channel ban.
+ *  @param chn Pointer to channel struct being modified
+ *  @param flag Flag, determining how the ban is being changed
+ *  @param args Ban to add
+ */
 void set_ban(struct channel* chn, char* flag, char* args) {
-    //Remove ban
+    //Again, f the first character of the flag is -, remove the ban
     if(flag[0] == '-') {
         char* banptr;
+        //Get the first set ban
         char* ban = strtok_r(chn->bans, " ", &banptr);
 
+        //Loop over all set bans
         for(int i = 0; i < 256; i++) {
+            //Return if the end of the bans array has been reached
             if(ban[0] == '\0') {
                 return;
             }
 
+            //If this is the ban we want to remove
             if(strcmp(ban, args) == 0) {
                 int len = strlen(ban);
+                //Replace the ban with null characters
                 for(int j = 0; j < len; j++) {
                     *ban = '\0';
                     ban++;
                 }
+                //Preserve the space separating the bans
                 *ban = ' ';
 
                 int nullcount = 0;
+                //Loop over all bans again
                 for(int j = 0; j < 256; j++) {
+                    //Count all the continuous null characters
                     if(chn->bans[j] == '\0') {
                         nullcount += 1;
                     }
                     else {
+                        //Move each character down, removing all null characters
                         for(int k = j; k < 256; k++) {
                             chn->bans[k-nullcount] = chn->bans[k];
                         }
@@ -380,76 +467,111 @@ void set_ban(struct channel* chn, char* flag, char* args) {
                 }
             }
 
+            //Get the next ban
             ban = strtok_r(NULL, " ", &banptr);
         }
     }
 
+    //Otherwise, add the ban
     strcat(chn->bans, args);
     strcat(chn->bans, " ");
 }
 
+/** @brief Send the list of bans to the user.
+ *  @param chn Pointer to the channel struct containing the bans
+ *  @param usr Pointer to user struct
+ */
 void display_bans(struct channel* chn, struct user* usr) {
     char banlist[256];
     //Copy original ban array as strtok_r is destructive
     strcpy(banlist, chn->bans);
 
+    //Allocate message array
     char message[64];
     char* banptr;
+    //Get the first ban
     char* ban = strtok_r(banlist, " ", &banptr);
 
+    //Loop over every ban
     for(int i = 0; i < 256; i++) {
+        //If the end of the ban arrays is reached, break
         if(ban[0] == '\0') {
             break;
         }
 
+        //Store the ban in the message buffer
         sprintf(message, "%s %s", chn->name, ban);
+        //Send the ban to the user
         sock_send(usr->c_sock, "367", usr->nick, message);
+        //Get the next ban
         ban = strtok_r(NULL, " ", &banptr);
     }
 
+    //Send the end of bans list message
     sprintf(message, "%s :End of channel ban list", chn->name);
     sock_send(usr->c_sock, "368", usr->nick, message);
 }
 
+/** @brief Check if the user is banned from a channel.
+ *  @param chn Pointer to channel struct
+ *  @param usr Pointer to user struct
+ *  @return True if the user is banned, false otherwise
+ */
 bool check_if_banned(struct channel* chn, struct user* usr) {
+    //Copy original ban array as strtok_r is destructive
     char banlist[256];
     strcpy(banlist, chn->bans);
 
     char* banptr;
+    //Get the first ban
     char* ban = strtok_r(banlist, " ", &banptr);
 
     for(int i = 0; i < 256; i++) {
+        //If the end of the bans array is reached, return
         if(ban[0] == '\0') {
             return false;
         }
-        //Check if nick banned
+        //Check if nick is banned
         if(strcmp(ban, usr->nick) == 0) {
             return true;
         }
-        //Check if IP banned
+        //Check if IP is banned
         if(strcmp(ban, usr->address) == 0) {
             return true;
         }
 
+        //If the ban is a mask, check against the user
+        //Ban masks are of the form nick!user@address
         char* ptr;
-        //Check nick from mask
+        //Check mask to see if the nick is banned
         if(strcmp(strtok_r(ban, "!", &ptr), usr->nick) == 0) {
             return true;
         }
-        //Ignore text before @
+        //Ignore text before @, we don't handle username bans
         strtok_r(NULL, "@", &ptr);
-        //Check address from mask
+        //Check if the address is banned
         if(strcmp(strtok_r(NULL, "@", &ptr), usr->address) == 0) {
             return true;
         }
 
+        //Get the next ban
         ban = strtok_r(NULL, " ", &banptr);
     }
+    //Otherwise, the user is not currently banned
     return false;
 }
 
+/** @brief Remove the user from a channel.
+ *
+ *  Dissociates the user struct from the channel's users list, and the
+ *  channel struct from the user's channels list.
+ *  @param chn Pointer to channel struct to remove the user from
+ *  @param usr Pointer to user struct being removed from the channel
+ */
 void remove_from_channel(struct channel* chn, struct user* usr) {
+    //Loop over every user and channel
     for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
+        //If we have reached the end of both the user and channel arrays, break the loop
         if(chn->users[i] == NULL && usr->channels[i] == NULL) {
             break;
         }
@@ -465,14 +587,16 @@ void remove_from_channel(struct channel* chn, struct user* usr) {
         }
     }
 
+    //Check if the channel should be removed
     if(!check_remove_channel(chn)) {
-        //Reorder channel's user array
+        //If not, reorder channel's user array
         reorder_user_array(chn->users);
     }
 
     //Reorder user's channel list
     for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
         if(usr->channels[i] == NULL) {
+            //Move every channel down a space if a NULL reference is encountered
             for(int j = i+1; j < CHANNEL_MAX_USERS; j++) {
                 usr->channels[j-1] = usr->channels[j];
             }

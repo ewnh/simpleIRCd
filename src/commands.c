@@ -10,7 +10,7 @@
 #include "commands.h"
 #include "socket.h"
 
-/** @brief JOIN command - Allows a user to join a channel.
+/** @brief JOIN command - allows a user to join a channel.
  *
  *  Finds the specified channel, checks the user can join and then associates
  *  the user's user struct with that channel's user list. Sends information
@@ -126,7 +126,7 @@ void join_channel(struct user* hc, char* strptr) {
     name_reply(hc, chn->name);
 }
 
-/** @brief PRIVMSG command - Allows a user to send a message to a channel.
+/** @brief PRIVMSG command - allows a user to send a message to a channel.
  *  @param usr Pointer to user struct
  *  @param strptr Pointer to the current reading location in the receiving buffer
  */
@@ -161,7 +161,7 @@ void send_privmsg(struct user* usr, char* strptr) {
     send_to_channel(chn, usr->nick, "PRIVMSG", chn->name, strptr);
 }
 
-/** @brief Send registrations messages to a newly joined user.
+/** @brief Send registration messages to a newly joined user.
  *  @param c_sock User socket to send messages to
  *  @param nick User's nickname
  *  @param username User's username
@@ -187,7 +187,7 @@ void send_registration_messages(SOCK c_sock, char* nick, char* username, char* a
     sock_send(c_sock, "376", nick, ":End of MOTD command");
 }
 
-/** @brief WHOIS command - Retrieves information about a user.
+/** @brief WHOIS command - retrieves information about a user.
  *
  *  Tells the requesting user the target's identifying information
  *  (e.g. nickname, username, etc.), which server the target is on
@@ -249,7 +249,7 @@ void whois_user(SOCK c_sock, char* sender, char* target) {
     sock_send(c_sock, "318", sender, tempbuffer);
 }
 
-/** @brief TOPIC command - Sets a channel's topic.
+/** @brief TOPIC command - sets a channel's topic.
  *  @param usr Pointer to user struct
  *  @param strptr Pointer to the current reading location in the receiving buffer
  */
@@ -276,7 +276,7 @@ void set_topic(struct user* usr, char* strptr) {
     send_to_channel(chn, usr->nick, "TOPIC", chn->name, chn->topic);
 }
 
-/** @brief NICK command - Sets a users nickname.
+/** @brief NICK command - sets a users nickname.
  *  @param usr Pointer to user struct
  *  @param nick User's requested nickname
  */

@@ -106,6 +106,9 @@ void send_error(struct channel* chn, struct user* usr, int error, char* arg) {
     case 421:
         sprintf(buffer, "%s :Unknown command", arg);
         break;
+    case 432:
+        sprintf(buffer, "%s :Erroneous nickname", arg);
+        break;
     case 433:
         sprintf(buffer, "%s :Nickname is already in use", arg);
         break;

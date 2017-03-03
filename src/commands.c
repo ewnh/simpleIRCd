@@ -282,6 +282,12 @@ void set_topic(struct user* usr, char* strptr) {
  */
 void set_nick(struct user* usr, char* nick) {
 
+    //If the nickname is empty or too long, send an error and return
+    if(nick[0] == '\0' || strlen(nick) > 9) {
+        send_error(NULL, usr, 432, nick);
+        return;
+    }
+
     //Search the users hashtable for the given nickname
     struct user* tempusr;
     HASH_FIND_STR(users, nick, tempusr);

@@ -221,25 +221,14 @@ int get_users_in_channel(struct channel* chn) {
     return CHANNEL_MAX_USERS;
 }
 
-/** @brief Check if a channel should be deleted, and do so if necessary.
- *
- *  Checks whether there are any users left in the channel. If there are none,
- *  the channel is deleted. Called by user_quit()
- *  @param chn Pointer to the channel to check
- *  @return True if the channel was deleted, false otherwise
+/** @brief Deletes a channel
+ *  @param chn Pointer to the channel to delete
  */
-bool check_remove_channel(struct channel* chn) {
-
-    //If there are no users left in the channel
-    if(get_users_in_channel(chn) == 0) {
-        //Remove the channel from the hashtable
-        HASH_DEL(channels, chn);
-        //And free the allocated memory
-        free(chn);
-        return true;
-    }
-
-    return false;
+void delete_channel(struct channel* chn) {
+    //Remove the channel from the hashtable
+    HASH_DEL(channels, chn);
+    //And free the allocated memory
+    free(chn);
 }
 
 /** @brief Check if a channel has a certain mode flag set.
@@ -591,7 +580,8 @@ void remove_from_channel(struct channel* chn, struct user* usr) {
     }
 
     //Check if the channel should be removed
-    if(!check_remove_channel(chn)) {
+    //Removing the channel is handled in user_quit() and user_part()
+    if(get_users_in_channel(chn) != 0) {
         //If not, reorder channel's user array
         reorder_user_array(chn->users);
     }

@@ -452,6 +452,11 @@ void user_part(struct user* usr, char* strptr) {
 
     //Remove the user struct from the channel's users list
     remove_from_channel(chn, usr);
+
+    //Delete channel if there are no remaining connected users
+    if(get_users_in_channel(chn) == 0) {
+        delete_channel(chn);
+    }
 }
 
 /** @brief QUIT command - allows a user to leave the server.
@@ -473,9 +478,13 @@ void user_quit(struct user* usr, char* message) {
         //Remove the user struct from each channel
         remove_from_channel(chn, usr);
 
-        //Remove the channel if there are no users left, otherwise send a QUIT message
-        if(!check_remove_channel(chn)) {
+        //If there are any more users connected to the channel, send a QUIT message
+        if(get_users_in_channel(chn) != 0) {
             send_to_channel(chn, usr->nick, "QUIT", "", message);
+        }
+        //Otherwise, delete the channel
+        else {
+            delete_channel(chn);
         }
     }
 

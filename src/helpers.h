@@ -15,7 +15,7 @@ void send_to_channel(struct channel*, char*, char*, char*, char*);
 struct channel* get_channel(struct user*, char*);
 void reorder_user_array(struct user**);
 int get_users_in_channel(struct channel*);
-bool check_remove_channel(struct channel*);
+void delete_channel(struct channel*);
 bool get_flag(char*, char);
 void set_flag(char*, char*);
 bool is_present(struct user**, struct user*);

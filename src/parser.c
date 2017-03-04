@@ -31,6 +31,7 @@ void handle_connection(struct user* usr) {
     //Set user variables
     memset(usr->channels, 0, sizeof(usr->channels));
     usr->is_registered = false;
+    usr->has_sent_quit = false;
 
     //Initialise variables required to receive messages
     char message[513];
@@ -145,6 +146,10 @@ void handle_connection(struct user* usr) {
     }
 
     printf("Connection closed\n");
+    //If the user hasn't already sent a QUIT message, send one automatically
+    if(!usr->has_sent_quit) {
+        user_quit(usr, "Connection closed by user");
+    }
     //Remove the user from the users hashtable
     HASH_DEL(users, usr);
     //Close connection and free memory allocated to user struct

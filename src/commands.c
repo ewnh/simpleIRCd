@@ -481,6 +481,9 @@ void user_quit(struct user* usr, char* message) {
 
     //Send an ERROR message to the user acknowledging the QUIT message
     sock_send(usr->c_sock, "ERROR", ":Closing Link:", message);
+
+    //The user has used QUIT, so set the appropriate variable
+    usr->has_sent_quit = true;
 }
 
 /** @brief LIST command - gives the user a list of all public channels on the server.

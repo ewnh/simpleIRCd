@@ -32,6 +32,10 @@ struct user {
      *  and USER commands) or not
      */
     bool is_registered;
+    /** Whether the user is quitting and has used the QUIT command or not.
+     *  Used to determine if a QUIT message should be automatically sent on disconnection
+     */
+    bool has_sent_quit;
     /** User's nickname, set using the NICK command */
     char nick[10];
     /** User's username, set using the USER command */

@@ -144,8 +144,10 @@ void handle_connection(struct user* usr) {
         }
     }
 
-    //Close connection and free memory allocated to user struct
     printf("Connection closed\n");
+    //Remove the user from the users hashtable
+    HASH_DEL(users, usr);
+    //Close connection and free memory allocated to user struct
     sock_close(usr->c_sock);
     free(usr);
     return;

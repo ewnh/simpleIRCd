@@ -255,8 +255,18 @@ void whois_user(SOCK c_sock, char* sender, char* target) {
  */
 void set_topic(struct user* usr, char* strptr) {
 
+    //Assign parts of string to variables first so we can check if they are valid
+    char* chn_name = strtok_r(NULL, " ", &strptr);
+    //Topic = next part of string, excluding the first character (which will be a colon)
+    char* topic = ++strptr;
+
+    //If the topic is invalid (too long), return
+    if(strlen(topic) > 50) {
+        return;
+    }
+
     //Find channel in the channels hashtable
-    struct channel* chn = get_channel(usr, strtok_r(NULL, " ", &strptr));
+    struct channel* chn = get_channel(usr, chn_name);
 
     //Return if it doesn't exist
     if(chn == NULL) {
@@ -270,7 +280,7 @@ void set_topic(struct user* usr, char* strptr) {
     }
 
     //Set the topic, ignoring the colon that topic messages are prefixed with
-    strcpy(chn->topic, ++strptr);
+    strcpy(chn->topic, topic);
 
     //Send a TOPIC message, notifying users of the topic change
     send_to_channel(chn, usr->nick, "TOPIC", chn->name, chn->topic);

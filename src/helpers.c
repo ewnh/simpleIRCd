@@ -87,7 +87,7 @@ void to_upper(char* str) {
  *  @param arg Optional additional argument
  */
 void send_error(struct channel* chn, struct user* usr, int error, char* arg) {
-    char buffer[64];
+    char buffer[512];
 
     //Convert the error numeric into a char array
     char errorstr[4];

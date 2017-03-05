@@ -569,7 +569,7 @@ void set_mode(struct user* usr, char* strptr) {
         }
 
         //All other mode actions require op privileges, so return if they don't have them
-        if(!is_present(chn->users, usr)) {
+        if(!is_present(chn->operators, usr)) {
             send_error(chn, usr, 482, NULL);
             return;
         }

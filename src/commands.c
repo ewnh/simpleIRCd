@@ -457,8 +457,15 @@ void user_part(struct user* usr, char* strptr) {
         return;
     }
 
-    //Send a PART message to every user in the channel
-    send_to_channel(chn, usr->nick, "PART", chn->name, strptr);
+    //If no reason is provided, use the user's nickname as the reason
+    if(strptr[0] == '\0') {
+        //Send a PART message to every user in the channel
+        send_to_channel(chn, usr->nick, "PART", chn->name, usr->nick);
+    }
+    //Otherwise, send the reason
+    else {
+        send_to_channel(chn, usr->nick, "PART", chn->name, strptr);
+    }
 
     //Remove the user struct from the channel's users list
     remove_from_channel(chn, usr);
@@ -654,7 +661,7 @@ void kick_user(struct user* usr, char* strptr) {
         return;
     }
 
-    //If no reason is provided, send the user's nickname instead
+    //If no reason is provided, send the user's nickname as the reason
     if(strptr[0] == '\0') {
         sprintf(buffer, "%s %s", kicked->nick, kicked->nick);
     }

@@ -193,60 +193,60 @@ void send_registration_messages(SOCK c_sock, char* nick, char* username, char* a
  *  (e.g. nickname, username, etc.), which server the target is on
  *  and a list of channel's the target is connected to along with their status on each.
  *
- *  @param c_sock Requesting user's client socket
- *  @param sender Nickname of the requesting user
- *  @param target Nickname of the target user
+ *  @param usr Pointer to user struct
+ *  @param nick Nickname of the target user
  */
-void whois_user(SOCK c_sock, char* sender, char* target) {
+void whois_user(struct user* usr, char* nick) {
 
     //Find the target user in the users hashtable
-    struct user* usr;
-    HASH_FIND_STR(users, target, usr);
+    struct user* target;
+    HASH_FIND_STR(users, nick, target);
 
-    //Return if they don't exist
-    if(usr == NULL) {
+    //Send an error and return if they don't exist
+    if(target == NULL) {
+        send_error(NULL, usr, 401, nick);
         return;
     }
 
-    char tempbuffer[128];
+    char buffer[128];
 
     //Send target's identifying information
-    sprintf(tempbuffer, "%s %s %s * :%s", usr->nick, usr->username, usr->address, usr->realname);
-    sock_send(c_sock, "311", sender, tempbuffer);
+    sprintf(buffer, "%s %s %s * :%s", target->nick, target->username, target->address, target->realname);
+    sock_send(usr->c_sock, "311", usr->nick, buffer);
 
     //Send information about which server the target is connected to
-    sprintf(tempbuffer, "%s %s :info", usr->nick, &server_name);
-    sock_send(c_sock, "312", sender, tempbuffer);
+    sprintf(buffer, "%s %s :info", target->nick, &server_name);
+    sock_send(usr->c_sock, "312", usr->nick, buffer);
 
     //Send list of channels the target is connected to along with their status on each
-    sprintf(tempbuffer, "%s :", usr->nick);
+    sprintf(buffer, "%s :", target->nick);
     for(int i = 0; i < CHANNEL_MAX_USERS; i++) {
-        if(usr->channels[i] == NULL) {
+        if(target->channels[i] == NULL) {
             break;
         }
 
         //Don't send hidden channels (with a +p flag)
-        if(get_flag(usr->channels[i]->mode, 'p')) {
+        if(get_flag(target->channels[i]->mode, 'p')) {
             continue;
         }
 
         //Prefix channel with @ if the target is an operator
-        if(is_present(usr->channels[i]->operators, usr)) {
-            strcat(tempbuffer, "@");
+        if(is_present(target->channels[i]->operators, target)) {
+            strcat(buffer, "@");
         }
         //Prefix with + if the user is voiced
-        else if(get_flag(usr->channels[i]->mode, 'm') && is_present(usr->channels[i]->voiced, usr)) {
-            strcat(tempbuffer, "+");
+        else if(get_flag(target->channels[i]->mode, 'm') && is_present(target->channels[i]->voiced, target)) {
+            strcat(buffer, "+");
         }
 
-        strcat(tempbuffer, usr->channels[i]->name);
-        strcat(tempbuffer, " ");
+        strcat(buffer, target->channels[i]->name);
+        strcat(buffer, " ");
     }
-    sock_send(c_sock, "319", sender, tempbuffer);
+    sock_send(usr->c_sock, "319", usr->nick, buffer);
 
     //Send end of WHOIS message
-    sprintf(tempbuffer, "%s :End of WHOIS list", usr->nick);
-    sock_send(c_sock, "318", sender, tempbuffer);
+    sprintf(buffer, "%s :End of WHOIS list", target->nick);
+    sock_send(usr->c_sock, "318", usr->nick, buffer);
 }
 
 /** @brief TOPIC command - sets a channel's topic.

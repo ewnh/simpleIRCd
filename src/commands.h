@@ -10,7 +10,7 @@
 void join_channel(struct user*, char*);
 void send_privmsg(struct user*, char*);
 void send_registration_messages(SOCK, char*, char*, char*);
-void whois_user(SOCK, char*, char*);
+void whois_user(struct user*, char*);
 void set_topic(struct user*, char*);
 void set_nick(struct user*, char*);
 void who_request(struct user*, char*);

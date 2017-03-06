@@ -111,7 +111,7 @@ void handle_connection(struct user* usr) {
             join_channel(usr, strptr);
         }
         else if(strcmp(command, "WHOIS") == 0) {
-            whois_user(usr->c_sock, usr->nick, strtok_r(NULL, " ", &strptr));
+            whois_user(usr, strtok_r(NULL, " ", &strptr));
         }
         else if(strcmp(command, "TOPIC") == 0) {
             set_topic(usr, strptr);

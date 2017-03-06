@@ -95,10 +95,13 @@ void send_error(struct channel* chn, struct user* usr, int error, char* arg) {
 
     //Switch on the numeric to determine the appropriate action to take
     switch(error) {
-    case 403:
+    case 401:
         //Add the formatted error message to the buffer
-        sprintf(buffer, "%s :No such channel", arg);
+        sprintf(buffer, "%s :No such nick", arg);
         //And exit this switch statement
+        break;
+    case 403:
+        sprintf(buffer, "%s :No such channel", arg);
         break;
     case 404:
         sprintf(buffer, "%s :Cannot send to channel", chn->name);

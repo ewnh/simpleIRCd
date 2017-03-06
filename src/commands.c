@@ -635,22 +635,35 @@ void kick_user(struct user* usr, char* strptr) {
     //Find the channel
     struct channel* chn = get_channel(usr, strtok_r(NULL, " ", &strptr));
 
-    //Store the nickname to kick
-    char tempbuffer[64];
-    strcpy(tempbuffer, strtok_r(NULL, " ", &strptr));
-
-    //Find the user with that nickname
-    struct user* kicked;
-    HASH_FIND_STR(users, tempbuffer, kicked);
-
-    //If either doesn't exist, return
-    if(chn == NULL || kicked == NULL) {
+    //If the channel does exist, return
+    if(chn == NULL) {
         return;
     }
 
+    //Store the nickname to kick
+    char buffer[64];
+    strcpy(buffer, strtok_r(NULL, " ", &strptr));
+
+    //Find the user with that nickname
+    struct user* kicked;
+    HASH_FIND_STR(users, buffer, kicked);
+
+    //If the target user doesn't exist, send an error response and return
+    if(kicked == NULL) {
+        send_error(NULL, usr, 401, buffer);
+        return;
+    }
+
+    //If no reason is provided, send the user's nickname instead
+    if(strptr[0] == '\0') {
+        sprintf(buffer, "%s %s", kicked->nick, kicked->nick);
+    }
+    //Otherwise, send the reason
+    else {
+        sprintf(buffer, "%s %s", kicked->nick, strptr);
+    }
     //Send a KICK message to the channel, notifying the users
-    sprintf(tempbuffer, "%s %s", kicked->nick, strtok_r(NULL, " ", &strptr));
-    send_to_channel(chn, usr->nick, "KICK", chn->name, tempbuffer);
+    send_to_channel(chn, usr->nick, "KICK", chn->name, buffer);
 
     //Remove kicked user from channel
     remove_from_channel(chn, kicked);

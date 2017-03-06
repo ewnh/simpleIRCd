@@ -458,7 +458,7 @@ void user_part(struct user* usr, char* strptr) {
     }
 
     //Send a PART message to every user in the channel
-    send_to_channel(chn, usr->nick, "PART", chn->name, strtok_r(NULL, " ", &strptr));
+    send_to_channel(chn, usr->nick, "PART", chn->name, strptr);
 
     //Remove the user struct from the channel's users list
     remove_from_channel(chn, usr);

@@ -126,7 +126,7 @@ void handle_connection(struct user* usr) {
             user_part(usr, strptr);
         }
         else if(strcmp(command, "QUIT") == 0) {
-            user_quit(usr, strtok_r(NULL, " ", &strptr));
+            user_quit(usr, strptr);
             //Stop executing the loop and go to cleanup
             break;
         }

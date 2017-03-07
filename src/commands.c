@@ -17,7 +17,7 @@
  *  (i.e. MODE, NAMES messages) to the user on joining.
  *
  *  @param hc User struct that is joining a channel
- *  @param name Name of channel to join
+ *  @param strptr Pointer to the current reading location in the receiving buffer
  */
 void join_channel(struct user* hc, char* strptr) {
 
@@ -348,8 +348,10 @@ void set_nick(struct user* usr, char* nick) {
 
 /** @brief WHO command - get information about users in a channel.
  *
- *  WHO messages are of the form "<channel> <user> <host> <server> <nick>
- *  ( "H" / "G" > ["*"] [ ( "@" / "+" ) ] :<hopcount> <real name>"
+    @verbatim WHO messages are of the form "<channel> <user> <host> <server> <nick>
+    ( "H" / "G" > ["*"] [ ( "@" / "+" ) ] :<hopcount> <real name>"
+    @endverbatim
+ *
  *  @param usr Pointer to user struct
  *  @param chn_name Name of channel to get information about
  */
@@ -394,8 +396,11 @@ void who_request(struct user* usr, char* chn_name) {
 
 /** @brief NAMES command - get a list of all users in a channel.
  *
- *  NAMES messages are of the form "( "=" / "*" / "@" ) <channel>
- *  :[ "@" / "+" ] <nick> *( " " [ "@" / "+" ] <nick> )"
+    @verbatim
+    NAMES messages are of the form "( "=" / "*" / "@" ) <channel>
+    :[ "@" / "+" ] <nick> *( " " [ "@" / "+" ] <nick> )"
+    @endverbatim
+ *
  *  @param usr Pointer to user struct
  *  @param chn_name Name of channel to get information about
  */

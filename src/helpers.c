@@ -166,6 +166,7 @@ void send_to_channel(struct channel* chn, char* hostname, char* command, char* t
 }
 
 /** @brief Retrieve a channel struct from the channels hashtable.
+ *  @param usr Pointer to user struct
  *  @param chn_name Name of channel to retrieve
  *  @return Pointer to the appropriate channel struct
  */

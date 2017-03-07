@@ -98,7 +98,7 @@ void join_channel(struct channel** channels, struct user* hc, char* name) {
  *  @param channels Channel hashtable
  *  @param target Channel to send message to
  *  @param sender Nickname of the user that sent the message
- *  @param raw_message Message to send
+ *  @param message Message to send
  */
 void send_privmsg(struct channel** channels, char* target, char* sender, char* message) {
 

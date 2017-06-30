@@ -113,13 +113,13 @@ void join_channel(struct user* hc, char* strptr) {
     send_to_channel(chn, hc->nick, "JOIN", chn->name, "");
 
     //Send mode message to the joining user
-    sock_send(hc->c_sock, "MODE", chn->name, chn->mode);
+    net_send(hc->c_sock, "MODE", chn->name, chn->mode);
 
     //If channel topic set, send to the user
     //Don't send a message if no topic set
     if(chn->topic[0] != '\0') {
         sprintf(buffer, "%s :%s", chn->name, chn->topic);
-        sock_send(hc->c_sock, "332", hc->nick, buffer);
+        net_send(hc->c_sock, "332", hc->nick, buffer);
     }
 
     //Send names message to the user
@@ -171,20 +171,20 @@ void send_registration_messages(SOCK c_sock, char* nick, char* username, char* a
     char tempbuffer[128];
     //Send initial registration messages
     sprintf(tempbuffer, "Welcome to the Internet Relay Network %s!%s@%s", nick, username, address);
-    sock_send(c_sock, "001", nick, tempbuffer);
+    net_send(c_sock, "001", nick, tempbuffer);
     sprintf(tempbuffer, "Your host is %s, running simpleIRCd", &server_name);
-    sock_send(c_sock, "002", nick, tempbuffer);
+    net_send(c_sock, "002", nick, tempbuffer);
     sprintf(tempbuffer, "This server was started %s", &startup_time);
-    sock_send(c_sock, "003", nick, tempbuffer);
+    net_send(c_sock, "003", nick, tempbuffer);
     sprintf(tempbuffer, "%s simpleIRCd mnptovklb", &server_name);
-    sock_send(c_sock, "004", nick, tempbuffer);
+    net_send(c_sock, "004", nick, tempbuffer);
 
     //Send message of the day (MOTD)
     sprintf(tempbuffer, ":- %s Message of the day - ", &server_name);
-    sock_send(c_sock, "375", nick, tempbuffer);
-    sock_send(c_sock, "372", nick, ":- Running simpleIRCd");
-    sock_send(c_sock, "372", nick, ":- https://github.com/ewnh/simpleIRCd");
-    sock_send(c_sock, "376", nick, ":End of MOTD command");
+    net_send(c_sock, "375", nick, tempbuffer);
+    net_send(c_sock, "372", nick, ":- Running simpleIRCd");
+    net_send(c_sock, "372", nick, ":- https://github.com/ewnh/simpleIRCd");
+    net_send(c_sock, "376", nick, ":End of MOTD command");
 }
 
 /** @brief WHOIS command - retrieves information about a user.
@@ -212,11 +212,11 @@ void whois_user(struct user* usr, char* nick) {
 
     //Send target's identifying information
     sprintf(buffer, "%s %s %s * :%s", target->nick, target->username, target->address, target->realname);
-    sock_send(usr->c_sock, "311", usr->nick, buffer);
+    net_send(usr->c_sock, "311", usr->nick, buffer);
 
     //Send information about which server the target is connected to
     sprintf(buffer, "%s %s :info", target->nick, &server_name);
-    sock_send(usr->c_sock, "312", usr->nick, buffer);
+    net_send(usr->c_sock, "312", usr->nick, buffer);
 
     //Send list of channels the target is connected to along with their status on each
     sprintf(buffer, "%s :", target->nick);
@@ -242,11 +242,11 @@ void whois_user(struct user* usr, char* nick) {
         strcat(buffer, target->channels[i]->name);
         strcat(buffer, " ");
     }
-    sock_send(usr->c_sock, "319", usr->nick, buffer);
+    net_send(usr->c_sock, "319", usr->nick, buffer);
 
     //Send end of WHOIS message
     sprintf(buffer, "%s :End of WHOIS list", target->nick);
-    sock_send(usr->c_sock, "318", usr->nick, buffer);
+    net_send(usr->c_sock, "318", usr->nick, buffer);
 }
 
 /** @brief TOPIC command - sets a channel's topic.
@@ -312,7 +312,7 @@ void set_nick(struct user* usr, char* nick) {
         //If user isn't in any channels and this is a nick change
         if(usr->channels[0] == NULL && usr->is_registered) {
             //Send the NICK message to only the user
-            sock_send_host(usr->c_sock, usr->nick, "NICK", "", nick);
+            net_send_host(usr->c_sock, usr->nick, "NICK", "", nick);
         }
         //If they are in any channels, loop over channels and send a channel message
         else {
@@ -386,12 +386,12 @@ void who_request(struct user* usr, char* chn_name) {
         //Send a WHO message
         sprintf(tempbuffer, "%s %s %s %s %s %s :%s %s", chn->name, chn->users[i]->username, chn->users[i]->address, &server_name,
                 op_status, chn->users[i]->nick, "0", chn->users[i]->realname);
-        sock_send(usr->c_sock, "352", usr->nick, tempbuffer);
+        net_send(usr->c_sock, "352", usr->nick, tempbuffer);
     }
 
     //Send the end of WHO message
     sprintf(tempbuffer, "%s :End of WHO list", chn->name);
-    sock_send(usr->c_sock, "315", usr->nick, tempbuffer);
+    net_send(usr->c_sock, "315", usr->nick, tempbuffer);
 }
 
 /** @brief NAMES command - get a list of all users in a channel.
@@ -441,11 +441,11 @@ void name_reply(struct user* usr, char* chn_name) {
     }
 
     //Send the NAMES message
-    sock_send(usr->c_sock, "353", usr->nick, buffer);
+    net_send(usr->c_sock, "353", usr->nick, buffer);
 
     //Send an end of NAMES message
     sprintf(buffer, "%s :End of NAMES list", chn->name);
-    sock_send(usr->c_sock, "366", usr->nick, buffer);
+    net_send(usr->c_sock, "366", usr->nick, buffer);
 }
 
 /** @brief PART command - allows a user to leave a channel.
@@ -511,7 +511,7 @@ void user_quit(struct user* usr, char* message) {
     }
 
     //Send an ERROR message to the user acknowledging the QUIT message
-    sock_send(usr->c_sock, "ERROR", ":Closing Link:", message);
+    net_send(usr->c_sock, "ERROR", ":Closing Link:", message);
 
     //The user has used QUIT, so set the appropriate variable
     usr->has_sent_quit = true;
@@ -533,11 +533,11 @@ void list_channels(struct user* usr) {
         }
         //Send a LIST message, containing the channel name, topic and number of users
         sprintf(tempbuffer, "%s %i :%s", chn->name, get_users_in_channel(chn), chn->topic);
-        sock_send(usr->c_sock, "322", usr->nick, tempbuffer);
+        net_send(usr->c_sock, "322", usr->nick, tempbuffer);
     }
 
     //Send end of LIST message
-    sock_send(usr->c_sock, "323", usr->nick, ":End of LIST");
+    net_send(usr->c_sock, "323", usr->nick, ":End of LIST");
 }
 
 /** @brief MODE command - adds or removes a mode to/from a channel.
@@ -561,7 +561,7 @@ void set_mode(struct user* usr, char* strptr) {
     if(strptr[0] == '\0') {
         //Reuse flag array
         sprintf(flag, "%s %s", chn->name, chn->mode);
-        sock_send(usr->c_sock, "324", usr->nick, flag);
+        net_send(usr->c_sock, "324", usr->nick, flag);
     }
     //If an argument is provided
     else {

@@ -43,7 +43,7 @@ void handle_connection(struct user* usr) {
         //Clear message array
         memset(message, 0, 513);
         //Receive data from the user
-        int recvstat = sock_recv(usr->c_sock, message, recvbuffer, &buffptr);
+        int recvstat = net_recv(usr->c_sock, message, recvbuffer, &buffptr);
         //Close connection if necessary
         if(recvstat == 1) {
             break;
@@ -95,7 +95,7 @@ void handle_connection(struct user* usr) {
         }
         else if(strcmp(command, "PING") == 0) {
             //PONG response, used by client to verify server is still responding
-            sock_send(usr->c_sock, "PONG", &server_name[0], strtok_r(NULL, " ", &strptr));
+            net_send(usr->c_sock, "PONG", &server_name[0], strtok_r(NULL, " ", &strptr));
         }
         else if(strcmp(command, "CAP") == 0) {
             //Split again to get next part of command
@@ -104,7 +104,7 @@ void handle_connection(struct user* usr) {
             //Display IRCv3 Capacities
             if(strcmp(command, "LS") == 0) {
                 //But we don't support any, so send an empty parameter
-                sock_send(usr->c_sock, "CAP", "*", "LS :");
+                net_send(usr->c_sock, "CAP", "*", "LS :");
             }
         }
         else if(strcmp(command, "JOIN") == 0) {
@@ -153,7 +153,7 @@ void handle_connection(struct user* usr) {
     //Remove the user from the users hashtable
     HASH_DEL(users, usr);
     //Close connection and free memory allocated to user struct
-    sock_close(usr->c_sock);
+    net_close(usr->c_sock);
     free(usr);
     return;
 }

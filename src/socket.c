@@ -46,7 +46,7 @@ void set_time() {
  *  and binds it to port 10000, allowing users to connect.
  *  @return Server socket
  */
-SOCK server_setup() {
+SOCK net_setup() {
 
     //Initialise Winsock
     #ifdef _WIN32
@@ -111,7 +111,7 @@ SOCK server_setup() {
  *
  *  Contains Windows-specific cleanup for the server.
  */
-void server_shutdown() {
+void net_shutdown() {
     #ifdef _WIN32
     WSACleanup();
     #endif
@@ -124,7 +124,7 @@ void server_shutdown() {
  *  @param c_sock Pointer to the location where the new user socket should be stored
  *  @param address Pointer to char array where the user's address should be stored
  */
-void sock_accept(SOCK sock, SOCK* c_sock, char* address) {
+void net_accept(SOCK sock, SOCK* c_sock, char* address) {
     struct sockaddr_in client;
 
     //Wait for a user to connect
@@ -166,7 +166,7 @@ void sock_accept(SOCK sock, SOCK* c_sock, char* address) {
  *  @param target Target of the message (generally either * or the user's nick)
  *  @param message Message to send
  */
-void sock_send_host(SOCK c_sock, char* hostname, char* command, char* target, char* message) {
+void net_send_host(SOCK c_sock, char* hostname, char* command, char* target, char* message) {
 
     //Check if the full message is too long
     if((strlen(hostname) + strlen(command) + strlen(target) + strlen(message) + 8) > 512) {
@@ -216,8 +216,8 @@ void sock_send_host(SOCK c_sock, char* hostname, char* command, char* target, ch
  *  @param target Target of the message (generally either * or the user's nick)
  *  @param message Message to send
  */
-void sock_send(SOCK c_sock, char* command, char* target, char* message) {
-    sock_send_host(c_sock, server_name, command, target, message);
+void net_send(SOCK c_sock, char* command, char* target, char* message) {
+    net_send_host(c_sock, server_name, command, target, message);
 }
 
 /** @brief Receives data from a user.
@@ -236,7 +236,7 @@ void sock_send(SOCK c_sock, char* command, char* target, char* message) {
  *  @param strptr Pointer to the start of the next message to read; used by strtok_r()
  *  @return Connection status - 1 if connection closed, 0 if not
  */
-int sock_recv(SOCK c_sock, char* message, char* buffer, char** strptr){
+int net_recv(SOCK c_sock, char* message, char* buffer, char** strptr){
     while(1) {
         //Check if all stored data has been read
         if(**strptr == '\0') {
@@ -286,7 +286,7 @@ int sock_recv(SOCK c_sock, char* message, char* buffer, char** strptr){
 /** @brief Close a socket
  *  @param c_sock Socket to close
  */
-void sock_close(SOCK c_sock) {
+void net_close(SOCK c_sock) {
     #ifdef _WIN32
     closesocket(c_sock);
     #else

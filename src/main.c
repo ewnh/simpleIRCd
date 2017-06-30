@@ -21,17 +21,17 @@ void start_handle_thread(struct user*);
 int main()
 {
     //Create a server socket
-    SOCK sock = server_setup();
+    SOCK sock = net_setup();
 
     while(1) {
         //Allocate memory for a new user struct
         struct user* usr = malloc(sizeof(struct user));
         //Assign accepted socket to new user struct
-        sock_accept(sock, &(usr->c_sock), usr->address);
+        net_accept(sock, &(usr->c_sock), usr->address);
         //Call start_handle_thread()
         start_handle_thread(usr);
     }
     //Shutdown the server
-    server_shutdown();
+    net_shutdown();
     return 0;
 }

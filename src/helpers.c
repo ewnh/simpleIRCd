@@ -136,7 +136,7 @@ void send_error(struct channel* chn, struct user* usr, int error, char* arg) {
     }
 
     //Send the error message to the user
-    sock_send(usr->c_sock, errorstr, usr->nick, buffer);
+    net_send(usr->c_sock, errorstr, usr->nick, buffer);
 }
 
 /** @brief Sends a message to every user in a channel.
@@ -161,7 +161,7 @@ void send_to_channel(struct channel* chn, char* hostname, char* command, char* t
         }
 
         //Send the message to each user
-        sock_send_host(chn->users[i]->c_sock, hostname, command, target, message);
+        net_send_host(chn->users[i]->c_sock, hostname, command, target, message);
     }
 }
 
@@ -498,14 +498,14 @@ void display_bans(struct channel* chn, struct user* usr) {
         //Store the ban in the message buffer
         sprintf(message, "%s %s", chn->name, ban);
         //Send the ban to the user
-        sock_send(usr->c_sock, "367", usr->nick, message);
+        net_send(usr->c_sock, "367", usr->nick, message);
         //Get the next ban
         ban = strtok_r(NULL, " ", &banptr);
     }
 
     //Send the end of bans list message
     sprintf(message, "%s :End of channel ban list", chn->name);
-    sock_send(usr->c_sock, "368", usr->nick, message);
+    net_send(usr->c_sock, "368", usr->nick, message);
 }
 
 /** @brief Check if the user is banned from a channel.

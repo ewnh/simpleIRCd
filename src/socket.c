@@ -234,9 +234,9 @@ void net_send(SOCK c_sock, char* command, char* target, char* message) {
  *  @param message Char array that stores retrieved message
  *  @param buffer Char array in which to store received data
  *  @param strptr Pointer to the start of the next message to read; used by strtok_r()
- *  @return Connection status - 1 if connection closed, 0 if not
+ *  @return True if error encountered or connection closed, false otherwise
  */
-int net_recv(SOCK c_sock, char* message, char* buffer, char** strptr){
+bool net_recv(SOCK c_sock, char* message, char* buffer, char** strptr){
     while(1) {
         //Check if all stored data has been read
         if(**strptr == '\0') {
@@ -258,7 +258,7 @@ int net_recv(SOCK c_sock, char* message, char* buffer, char** strptr){
 
                 //Check if connection closed
                 if(recvbytes <= 0) {
-                    return 1;
+                    return true;
                 }
 
                 totalbytes += recvbytes;
@@ -279,7 +279,7 @@ int net_recv(SOCK c_sock, char* message, char* buffer, char** strptr){
 
         //Copy next command in message array
         strcpy(message, strtok_r(NULL, "\r", strptr));
-        return 0;
+        return false;
     }
 }
 

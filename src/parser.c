@@ -3,6 +3,7 @@
  */
 
 #include <stdio.h>
+#include <stdbool.h>
 
 #ifdef _WIN32
 #include <process.h>
@@ -42,10 +43,8 @@ void handle_connection(struct user* usr) {
     while(1) {
         //Clear message array
         memset(message, 0, 513);
-        //Receive data from the user
-        int recvstat = net_recv(usr->c_sock, message, recvbuffer, &buffptr);
-        //Close connection if necessary
-        if(recvstat == 1) {
+        //Receive data and close connection if necessary
+        if(net_recv(usr->c_sock, message, recvbuffer, &buffptr)) {
             break;
         }
         printf("%i: %s\n", usr->c_sock, message);

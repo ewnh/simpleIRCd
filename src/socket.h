@@ -5,6 +5,8 @@
 #ifndef SOCKET_H_INCLUDED
 #define SOCKET_H_INCLUDED
 
+#include <stdbool.h>
+
 /** @brief Ensures compatibility over Windows and Linux
  *
  *  Linux sockets have an integer type\n
@@ -25,7 +27,7 @@ void net_shutdown();
 void net_accept(SOCK, SOCK*, char*);
 void net_send_host(SOCK, char*, char*, char*, char*);
 void net_send(SOCK, char*, char*, char*);
-int net_recv(SOCK, char*, char*, char**);
+bool net_recv(SOCK, char*, char*, char**);
 void net_close(SOCK);
 
 #endif // SOCKET_H_INCLUDED

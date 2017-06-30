@@ -9,6 +9,8 @@
 #include "../lib/uthash.h"
 #include "socket.h"
 
+/** @brief Port to bind socket to */
+#define NET_PORT 6667
 /** @brief Maximum number of users in any channel */
 #define CHANNEL_MAX_USERS 100
 /** @brief Maximum number of channel flags */

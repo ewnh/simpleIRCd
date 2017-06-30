@@ -43,7 +43,7 @@ void set_time() {
 /** @brief Initialises the server.
  *
  *  Creates a server socket, sets the server hostname and startup time,
- *  and binds it to port 10000, allowing users to connect.
+ *  and binds it to port 6667 (by default)
  *  @return Server socket
  */
 SOCK net_setup() {
@@ -83,9 +83,9 @@ SOCK net_setup() {
     //Set socket details
     server.sin_family = AF_INET;
     server.sin_addr.s_addr = INADDR_ANY;
-    server.sin_port = htons(6667);
+    server.sin_port = htons(NET_PORT);
 
-    //Bind to port 6667
+    //Bind to port
     int err = bind(sock, (struct sockaddr *)&server, sizeof(server));
     #ifdef _WIN32
     if (err == SOCKET_ERROR) {

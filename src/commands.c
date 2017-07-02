@@ -172,15 +172,15 @@ void send_registration_messages(SOCK c_sock, char* nick, char* username, char* a
     //Send initial registration messages
     sprintf(tempbuffer, "Welcome to the Internet Relay Network %s!%s@%s", nick, username, address);
     net_send(c_sock, "001", nick, tempbuffer);
-    sprintf(tempbuffer, "Your host is %s, running simpleIRCd", &server_name);
+    sprintf(tempbuffer, "Your host is %s, running simpleIRCd", server_name);
     net_send(c_sock, "002", nick, tempbuffer);
-    sprintf(tempbuffer, "This server was started %s", &startup_time);
+    sprintf(tempbuffer, "This server was started %s", startup_time);
     net_send(c_sock, "003", nick, tempbuffer);
-    sprintf(tempbuffer, "%s simpleIRCd mnptovklb", &server_name);
+    sprintf(tempbuffer, "%s simpleIRCd mnptovklb", server_name);
     net_send(c_sock, "004", nick, tempbuffer);
 
     //Send message of the day (MOTD)
-    sprintf(tempbuffer, ":- %s Message of the day - ", &server_name);
+    sprintf(tempbuffer, ":- %s Message of the day - ", server_name);
     net_send(c_sock, "375", nick, tempbuffer);
     net_send(c_sock, "372", nick, ":- Running simpleIRCd");
     net_send(c_sock, "372", nick, ":- https://github.com/ewnh/simpleIRCd");
@@ -215,7 +215,7 @@ void whois_user(struct user* usr, char* nick) {
     net_send(usr->c_sock, "311", usr->nick, buffer);
 
     //Send information about which server the target is connected to
-    sprintf(buffer, "%s %s :info", target->nick, &server_name);
+    sprintf(buffer, "%s %s :info", target->nick, server_name);
     net_send(usr->c_sock, "312", usr->nick, buffer);
 
     //Send list of channels the target is connected to along with their status on each
@@ -384,7 +384,7 @@ void who_request(struct user* usr, char* chn_name) {
         }
 
         //Send a WHO message
-        sprintf(tempbuffer, "%s %s %s %s %s %s :%s %s", chn->name, chn->users[i]->username, chn->users[i]->address, &server_name,
+        sprintf(tempbuffer, "%s %s %s %s %s %s :%s %s", chn->name, chn->users[i]->username, chn->users[i]->address, server_name,
                 op_status, chn->users[i]->nick, "0", chn->users[i]->realname);
         net_send(usr->c_sock, "352", usr->nick, tempbuffer);
     }

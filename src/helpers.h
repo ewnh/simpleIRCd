@@ -8,7 +8,7 @@
 #include <stdbool.h>
 #include "defines.h"
 
-char* strtok_r(char *, const char *, char **);
+char* strsplit(char *, const char *, char **);
 void to_upper(char*);
 void send_error(struct channel*, struct user*, int, char*);
 void send_to_channel(struct channel*, char*, char*, char*, char*);

@@ -7,14 +7,14 @@
 
 #include "defines.h"
 
-/** @brief Implementation of strtok_r() - splits char arrays on the delimiter character.
+/** @brief Implementation of strsplit() - splits char arrays on the delimiter character.
  *
  *  @warning Destructive - removes delimiter character(s) from original string, and replaces
  *  with NULL character(s)
  *
- *  @note MinGW does not contain an implementation of strtok_r, making this necessary
+ *  @note MinGW does not contain an implementation of strsplit, making this necessary
  *
- *  @note Public domain strtok_r() by Charlie Gordon from comp.lang.c  9/14/2007
+ *  @note Public domain strsplit() by Charlie Gordon from comp.lang.c  9/14/2007
  *  @note http://groups.google.com/group/comp.lang.c/msg/2ab1ecbb86646684
  *  @note (Declaration that it's public domain):
  *  @note http://groups.google.com/group/comp.lang.c/msg/7c7b39328fefab9c
@@ -24,7 +24,7 @@
  *  @param nextp Pointer pointing at location of last split; modified internally
  *  @return Pointer to char array containing string resulting from split
  */
-char* strtok_r(char *str, const char *delim, char **nextp) {
+char* strsplit(char *str, const char *delim, char **nextp) {
     char *ret;
 
     //If passed in array is empty, set pointer to location of last split
@@ -426,7 +426,7 @@ void set_ban(struct channel* chn, char* flag, char* args) {
     if(flag[0] == '-') {
         char* banptr;
         //Get the first set ban
-        char* ban = strtok_r(chn->bans, " ", &banptr);
+        char* ban = strsplit(chn->bans, " ", &banptr);
 
         //Loop over all set bans
         for(int i = 0; i < 256; i++) {
@@ -464,7 +464,7 @@ void set_ban(struct channel* chn, char* flag, char* args) {
             }
 
             //Get the next ban
-            ban = strtok_r(NULL, " ", &banptr);
+            ban = strsplit(NULL, " ", &banptr);
         }
     }
 
@@ -479,14 +479,14 @@ void set_ban(struct channel* chn, char* flag, char* args) {
  */
 void display_bans(struct channel* chn, struct user* usr) {
     char banlist[256];
-    //Copy original ban array as strtok_r is destructive
+    //Copy original ban array as strsplit is destructive
     strcpy(banlist, chn->bans);
 
     //Allocate message array
     char message[64];
     char* banptr;
     //Get the first ban
-    char* ban = strtok_r(banlist, " ", &banptr);
+    char* ban = strsplit(banlist, " ", &banptr);
 
     //Loop over every ban
     for(int i = 0; i < 256; i++) {
@@ -500,7 +500,7 @@ void display_bans(struct channel* chn, struct user* usr) {
         //Send the ban to the user
         net_send(usr->c_sock, "367", usr->nick, message);
         //Get the next ban
-        ban = strtok_r(NULL, " ", &banptr);
+        ban = strsplit(NULL, " ", &banptr);
     }
 
     //Send the end of bans list message
@@ -514,13 +514,13 @@ void display_bans(struct channel* chn, struct user* usr) {
  *  @return True if the user is banned, false otherwise
  */
 bool check_if_banned(struct channel* chn, struct user* usr) {
-    //Copy original ban array as strtok_r is destructive
+    //Copy original ban array as strsplit is destructive
     char banlist[256];
     strcpy(banlist, chn->bans);
 
     char* banptr;
     //Get the first ban
-    char* ban = strtok_r(banlist, " ", &banptr);
+    char* ban = strsplit(banlist, " ", &banptr);
 
     for(int i = 0; i < 256; i++) {
         //If the end of the bans array is reached, return
@@ -540,18 +540,18 @@ bool check_if_banned(struct channel* chn, struct user* usr) {
         //Ban masks are of the form nick!user@address
         char* ptr;
         //Check mask to see if the nick is banned
-        if(strcmp(strtok_r(ban, "!", &ptr), usr->nick) == 0) {
+        if(strcmp(strsplit(ban, "!", &ptr), usr->nick) == 0) {
             return true;
         }
         //Ignore text before @, we don't handle username bans
-        strtok_r(NULL, "@", &ptr);
+        strsplit(NULL, "@", &ptr);
         //Check if the address is banned
-        if(strcmp(strtok_r(NULL, "@", &ptr), usr->address) == 0) {
+        if(strcmp(strsplit(NULL, "@", &ptr), usr->address) == 0) {
             return true;
         }
 
         //Get the next ban
-        ban = strtok_r(NULL, " ", &banptr);
+        ban = strsplit(NULL, " ", &banptr);
     }
     //Otherwise, the user is not currently banned
     return false;

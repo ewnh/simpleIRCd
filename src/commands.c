@@ -23,7 +23,7 @@ void join_channel(struct user* hc, char* strptr) {
 
     //Copy channel name into buffer
     char buffer[64];
-    strcpy(buffer, strtok_r(NULL, " ", &strptr));
+    strcpy(buffer, strsplit(NULL, " ", &strptr));
 
     //Return and send an error if specified name is too long
     if(strlen(buffer) > 50) {
@@ -83,7 +83,7 @@ void join_channel(struct user* hc, char* strptr) {
             return;
         }
         //Check if sent password is correct
-        if(get_flag(chn->mode, 'k') && strcmp(chn->password, strtok_r(NULL, " ", &strptr)) != 0) {
+        if(get_flag(chn->mode, 'k') && strcmp(chn->password, strsplit(NULL, " ", &strptr)) != 0) {
             send_error(chn, hc, 475, NULL);
             return;
         }
@@ -134,7 +134,7 @@ void send_privmsg(struct user* usr, char* strptr) {
 
     //Copy channel name into buffer
     char buffer[64];
-    strcpy(buffer, strtok_r(NULL, " ", &strptr));
+    strcpy(buffer, strsplit(NULL, " ", &strptr));
 
     //Find channel
     struct channel* chn = get_channel(usr, buffer);
@@ -256,7 +256,7 @@ void whois_user(struct user* usr, char* nick) {
 void set_topic(struct user* usr, char* strptr) {
 
     //Assign parts of string to variables first so we can check if they are valid
-    char* chn_name = strtok_r(NULL, " ", &strptr);
+    char* chn_name = strsplit(NULL, " ", &strptr);
     //Topic = next part of string, excluding the first character (which will be a colon)
     char* topic = ++strptr;
 
@@ -455,7 +455,7 @@ void name_reply(struct user* usr, char* chn_name) {
 void user_part(struct user* usr, char* strptr) {
 
     //Get the appropriate channel
-    struct channel* chn = get_channel(usr, strtok_r(NULL, " ", &strptr));
+    struct channel* chn = get_channel(usr, strsplit(NULL, " ", &strptr));
 
     //Return if it doesn't exist
     if(chn == NULL) {
@@ -549,7 +549,7 @@ void list_channels(struct user* usr) {
 void set_mode(struct user* usr, char* strptr) {
 
     //Find the specified channel
-    struct channel* chn = get_channel(usr, strtok_r(NULL, " ", &strptr));
+    struct channel* chn = get_channel(usr, strsplit(NULL, " ", &strptr));
 
     //Return if it doesn't exist
     if(chn == NULL) {
@@ -567,12 +567,12 @@ void set_mode(struct user* usr, char* strptr) {
     else {
         //Clear the flag array and copy the flag argument given into it
         memset(flag, '\0', sizeof(flag));
-        strcpy(flag, strtok_r(NULL, " ", &strptr));
+        strcpy(flag, strsplit(NULL, " ", &strptr));
 
         //Allocate an array to hold arguments (e.g. password) and copy them into it
         char args[64];
         memset(args, '\0', sizeof(args));
-        strcpy(args, strtok_r(NULL, " ", &strptr));
+        strcpy(args, strsplit(NULL, " ", &strptr));
 
         //Check if user wants to display bans
         if(strcmp(flag, "+b") == 0 && args[0] == '\0') {
@@ -645,7 +645,7 @@ void set_mode(struct user* usr, char* strptr) {
 void kick_user(struct user* usr, char* strptr) {
 
     //Find the channel
-    struct channel* chn = get_channel(usr, strtok_r(NULL, " ", &strptr));
+    struct channel* chn = get_channel(usr, strsplit(NULL, " ", &strptr));
 
     //If the channel does exist, return
     if(chn == NULL) {
@@ -654,7 +654,7 @@ void kick_user(struct user* usr, char* strptr) {
 
     //Store the nickname to kick
     char buffer[64];
-    strcpy(buffer, strtok_r(NULL, " ", &strptr));
+    strcpy(buffer, strsplit(NULL, " ", &strptr));
 
     //Find the user with that nickname
     struct user* kicked;

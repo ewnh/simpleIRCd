@@ -233,7 +233,7 @@ void net_send(SOCK c_sock, char* command, char* target, char* message) {
  *  @param c_sock User socket
  *  @param message Char array that stores retrieved message
  *  @param buffer Char array in which to store received data
- *  @param strptr Pointer to the start of the next message to read; used by strtok_r()
+ *  @param strptr Pointer to the start of the next message to read; used by strsplit()
  *  @return True if error encountered or connection closed, false otherwise
  */
 bool net_recv(SOCK c_sock, char* message, char* buffer, char** strptr){
@@ -278,7 +278,7 @@ bool net_recv(SOCK c_sock, char* message, char* buffer, char** strptr){
         }
 
         //Copy next command in message array
-        strcpy(message, strtok_r(NULL, "\r", strptr));
+        strcpy(message, strsplit(NULL, "\r", strptr));
         return false;
     }
 }

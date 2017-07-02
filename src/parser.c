@@ -51,26 +51,26 @@ void handle_connection(struct user* usr) {
 
         char* strptr;
         //Get the command from the received message
-        char* command = strtok_r(message, " ", &strptr);
+        char* command = strsplit(message, " ", &strptr);
         //Convert command to uppercase
         to_upper(command);
 
         //Until the user has registered, they only have access to NICK and USER
         if(strcmp(command, "NICK") == 0) {
-            set_nick(usr, strtok_r(NULL, " ", &strptr));
+            set_nick(usr, strsplit(NULL, " ", &strptr));
             //Skip the rest of the loop so we don't get to the error at the bottom
             continue;
         }
         else if(strcmp(command, "USER") == 0) {
             //Store next word as the user's username
-            strcpy(usr->username, strtok_r(NULL, " ", &strptr));
+            strcpy(usr->username, strsplit(NULL, " ", &strptr));
 
             //Ignore next two parameters; not used
-            strtok_r(NULL, " ", &strptr);
-            strtok_r(NULL, " ", &strptr);
+            strsplit(NULL, " ", &strptr);
+            strsplit(NULL, " ", &strptr);
 
             //Store next word as the user's real name
-            char* realnm = strtok_r(NULL, " ", &strptr);
+            char* realnm = strsplit(NULL, " ", &strptr);
             strcpy(usr->realname, ++realnm);
 
             //User has now verified, so set the boolean
@@ -94,11 +94,11 @@ void handle_connection(struct user* usr) {
         }
         else if(strcmp(command, "PING") == 0) {
             //PONG response, used by client to verify server is still responding
-            net_send(usr->c_sock, "PONG", &server_name[0], strtok_r(NULL, " ", &strptr));
+            net_send(usr->c_sock, "PONG", &server_name[0], strsplit(NULL, " ", &strptr));
         }
         else if(strcmp(command, "CAP") == 0) {
             //Split again to get next part of command
-            command = strtok_r(NULL, " ", &strptr);
+            command = strsplit(NULL, " ", &strptr);
 
             //Display IRCv3 Capacities
             if(strcmp(command, "LS") == 0) {
@@ -110,16 +110,16 @@ void handle_connection(struct user* usr) {
             join_channel(usr, strptr);
         }
         else if(strcmp(command, "WHOIS") == 0) {
-            whois_user(usr, strtok_r(NULL, " ", &strptr));
+            whois_user(usr, strsplit(NULL, " ", &strptr));
         }
         else if(strcmp(command, "TOPIC") == 0) {
             set_topic(usr, strptr);
         }
         else if(strcmp(command, "WHO") == 0) {
-            who_request(usr, strtok_r(NULL, " ", &strptr));
+            who_request(usr, strsplit(NULL, " ", &strptr));
         }
         else if(strcmp(command, "NAMES") == 0) {
-            name_reply(usr, strtok_r(NULL, " ", &strptr));
+            name_reply(usr, strsplit(NULL, " ", &strptr));
         }
         else if(strcmp(command, "PART") == 0) {
             user_part(usr, strptr);

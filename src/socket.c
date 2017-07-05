@@ -10,6 +10,7 @@
 /** @see socket.h */
 #ifdef _WIN32
 #include <winsock2.h>
+#include <ws2tcpip.h>
 #define SOCK SOCKET //socket type
 
 #else
@@ -131,7 +132,7 @@ void net_accept(SOCK sock, SOCK* c_sock, char* address) {
     listen(sock, 10);
     printf("Waiting for connections\n");
 
-    int c = sizeof(struct sockaddr_in);
+    socklen_t c = sizeof(struct sockaddr_in);
     //Accept connection
     *c_sock = accept(sock, (struct sockaddr *)&client, &c);
 

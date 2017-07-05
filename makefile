@@ -1,4 +1,4 @@
-CFLAGS = -g -O2 -Wall -std=c99
+CFLAGS = -g -O2 -Wall -std=c99 -flto
 
 ifeq ($(OS),Windows_NT)
 	CFLAGS += -D_WIN32

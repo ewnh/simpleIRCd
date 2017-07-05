@@ -7,14 +7,14 @@
 
 #include "defines.h"
 
-/** @brief Implementation of strsplit() - splits char arrays on the delimiter character.
+/** @brief Implementation of strtok_r() - splits char arrays on the delimiter character.
  *
  *  @warning Destructive - removes delimiter character(s) from original string, and replaces
  *  with NULL character(s)
  *
- *  @note MinGW does not contain an implementation of strsplit, making this necessary
+ *  @note MinGW does not contain an implementation of strtok_r(), making this necessary
  *
- *  @note Public domain strsplit() by Charlie Gordon from comp.lang.c  9/14/2007
+ *  @note Public domain strtok_r() by Charlie Gordon from comp.lang.c  9/14/2007
  *  @note http://groups.google.com/group/comp.lang.c/msg/2ab1ecbb86646684
  *  @note (Declaration that it's public domain):
  *  @note http://groups.google.com/group/comp.lang.c/msg/7c7b39328fefab9c

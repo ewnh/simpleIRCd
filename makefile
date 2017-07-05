@@ -3,9 +3,11 @@ CFLAGS = -g -O2 -Wall -std=c99 -flto
 ifeq ($(OS),Windows_NT)
 	CFLAGS += -D_WIN32
 	LDFLAGS = -lws2_32
+	RM = del simpleIRCd.exe
 else
 	CFLAGS += -Dlinux -D_XOPEN_SOURCE=500
 	LDFLAGS = -pthread
+	RM = rm simpleIRCd
 endif
 
 all: main.o socket.o parser.o commands.o helpers.o
@@ -25,3 +27,6 @@ commands.o: src/commands.c src/commands.h src/defines.h src/helpers.h src/socket
     
 helpers.o: src/helpers.c src/defines.h
 	gcc $(CFLAGS) -c src/helpers.c
+
+clean:
+	$(RM) *.o
